@@ -1,0 +1,224 @@
+\documentclass[11pt,reqno]{amsart}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage[final]{microtype}
+\usepackage{hyperref}
+
+\emergencystretch=2em
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\card}[1]{|#1|}
+
+\title[Erd\H{o}s Problem \#132: Formalization and Moment Obstructions]{Lean~4 Formalization of Erd\H{o}s Problem~\#132 and a Regular-Polygon Moment Obstruction Closing $n=14$}
+
+\author{Tomasz Tar\l{}owski}
+\date{November 22, 2026}
+
+\begin{document}
+
+\begin{abstract}
+Let $X \subset \R^2$ be a finite set of $n$ points, and write $\mu(X, d)$ for the number of unordered pairs in $X$ at Euclidean distance $d > 0$. Erd\H{o}s and Pach~\cite{Er84c,ErPa90,ErFi95,Er97e} conjectured that for every $n \ge 5$, $X$ must determine at least two distinct distances $d$ satisfying $1 \le \mu(X, d) \le n$, with Erd\H{o}s offering \$100 in~\cite{Er97e} for any nontrivial result toward this problem. While Erd\H{o}s and Fishburn~\cite{ErFi95} settled $n = 5, 6$ and Clemen, Dumitrescu, and Liu~\cite{CDL25} settled convex sets, no machine-checked formalization existed on the Erd\H{o}s Problems database~\cite{Bl26}, and recent small-$n$ analyses halted at $n = 13$ under the assumption that $n = 14$ required classifying $14$-point $7$-distance sets.
+
+We present a complete, axiom-clean Lean~4 and Mathlib formalization (\texttt{Matematyka/Erdos132.lean}, depending solely on the three standard axioms \texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}) together with a new general analytic-geometric obstruction. Specifically:
+\begin{enumerate}
+  \item We formalize \texttt{Erdos132Conjecture} and prove the sharp boundary \texttt{not\_erdos132\_four} via the $4$-point unit rhombus, alongside an unconditional proof of the Hopf--Pannwitz diameter theorem~\cite{HoPa34} (\texttt{diameter\_multiplicity\_le\_card}).
+  \item Using exact $3 \times 3$ planar Gram minors and rational-free integer Positivstellensatz witnesses verified inside the Lean kernel across all $1,024$ edge two-colorings of $K_5$ ($12$ labeled $C_5$ patterns forcing golden-ratio edge squares, $1,012$ refuted patterns) and all $30$ symmetric $(1,7,7)$ extensions on $6$ vertices, we give the first unconditional machine-checked Lean~4 proofs of $g(2) = 5$ (\texttt{no\_six\_point\_two\_dist}) and Erd\H{o}s~\#132 for $n = 5$ and $n = 6$ (\texttt{erdos132\_five}, \texttt{erdos132\_six}).
+  \item We prove a new general second- and fourth-moment inequality obstruction (\texttt{no\_regPoly\_violator\_extension}): for every $m \ge 4$, no planar point $x$ outside a regular $m$-gon $R_m$ can absorb an $(m, m, \dots, m)$-type distance degree signature with a single diameter pair, reducing the threshold to $3m > 9$ (exact equality holds at $m = 3$ for the rhombus).
+  \item Combining even-size endpoint descent ($\binom{2r+2}{2} = 1 + r(2r+3)$) with our moment obstruction (\texttt{erdos132\_even\_of\_classification}), we unify the even cases $n = 8, 10, 14$ and resolve the open $n = 14$ barrier ($r = 6$, $m = 13$, via Wei's theorem $g(6) = 13$~\cite{We12}), since the $(2r+3)=15$ multiplicity ceiling automatically discards the $R_{12}^+$ and centered hexagram $13$-point $6$-distance families ($24 > 15$) and $m = 13$ satisfies $3 \cdot 13 = 39 > 9$.
+\end{enumerate}
+\end{abstract}
+
+\maketitle
+
+\section{Introduction and Problem Context}
+
+For a finite planar point set $X \subset \R^2$ of size $n = \card{X}$, define the positive distance spectrum
+\[
+D(X) := \{ \|p - q\| : p, q \in X,\ p \neq q \} \subset \R_{>0},
+\]
+and for each $d \in D(X)$, let
+\[
+\mu(X, d) := \bigl|\bigl\{ \{p, q\} \in \binom{X}{2} : \|p - q\| = d \bigr\}\bigr|
+\]
+denote the unordered-pair multiplicity of $d$ in $X$. We call $d \in D(X)$ a \emph{rare distance} of $X$ if $1 \le \mu(X, d) \le n$. Write
+\[
+\mathcal{R}(X) := \{ d \in D(X) : \mu(X, d) \le n \}.
+\]
+
+By the classical theorem of Hopf and Pannwitz~\cite{HoPa34}, every $X \subset \R^2$ with $\card{X} \ge 2$ satisfies $\mu(X, \operatorname{diam}(X)) \le n$, so $\card{\mathcal{R}(X)} \ge 1$ holds unconditionally. Erd\H{o}s and Pach~\cite{Er84c,ErPa90,ErFi95,Er97b,Er97e} asked whether a second rare distance is forced once $n \ge 5$:
+
+\begin{conjecture}[Erd\H{o}s Problem \#132~\cite{Er84c,ErFi95,Er97e}]\label{conj:e132}
+For every integer $n \ge 5$ and every finite set $X \subset \R^2$ with $\card{X} = n$, one has $\card{\mathcal{R}(X)} \ge 2$. Moreover, does $\min_{\card{X}=n} \card{\mathcal{R}(X)} \to \infty$ as $n \to \infty$?
+\end{conjecture}
+
+When $n = 4$, two equilateral triangles sharing an edge form a unit rhombus with vertices $(0,0), (1,0), (\tfrac{1}{2}, \pm \tfrac{\sqrt{3}}{2})$, having $5$ unit edges and a unique diagonal $\sqrt{3}$ ($\mu = 1$); hence $\card{\mathcal{R}(X)} = 1$ and $n \ge 5$ is sharp. In~\cite{Er97e}, Erd\H{o}s offered a \$100 prize explicitly \emph{``for any nontrivial result''}. Earlier human milestones include Erd\H{o}s and Fishburn~\cite{ErFi95}, who established $\card{\mathcal{R}(X)} \ge 2$ for $n = 5$ and $n = 6$, and Clemen, Dumitrescu, and Liu~\cite{CDL25}, who resolved the conjecture for convex point sets and sets that are ``not too convex.''
+
+Writing $k = \card{D(X)}$, double-counting the $\binom{n}{2}$ pairs immediately rules out any violator with $\card{\mathcal{R}(X)} = 1$ whenever
+\begin{equation}\label{eq:pigeonhole}
+\binom{n}{2} < 1 + (k - 1)(n + 1).
+\end{equation}
+Since $k \ge g^{-1}(n)$ where $g(r)$ denotes the maximum number of points in $\R^2$ determining at most $r$ distinct distances, Erd\H{o}s~\#132 becomes nontrivial precisely in the tight low-distance regime where $1 + (k - 1)(n + 1) \le \binom{n}{2}$. Notice that when $n = 2r + 2$ ($r \ge 2$), we have the exact identity
+\[
+\binom{2r + 2}{2} = (r + 1)(2r + 1) = 1 + r(2r + 3) = 1 + r(n + 1).
+\]
+Consequently, knowing $g(r) \le 2r + 1$ (so $k \ge r + 1$) hits exact equality in \eqref{eq:pigeonhole} and leaves an isolated extremal class in which the diameter occurs \emph{once} and every other distance $d \in D(X) \setminus \{\Delta\}$ has multiplicity \emph{exactly} $2r + 3 = n + 1$.
+
+Recent small-$n$ notes halted at $n = 13$ because no structural exclusion handled $n = 14$ ($r = 6$) cleanly; indeed, Remark~5 of July~2026 notes on Erd\H{o}s~\#132 stated that $n = 14$ lay beyond existing classifications because it appeared to require $14$-point $7$-distance sets. In this paper we resolve that obstacle cleanly by combining endpoint deletion ($14 \to 13$) with a new general $m \ge 4$ regular-polygon moment-inequality theorem, and we provide a complete Lean~4 formalization of the problem statement together with unconditional formal proofs for $n = 4, 5, 6$, Hopf--Pannwitz, and the even-size reduction.
+
+\section{Formalization Architecture in Lean~4}
+
+Our Lean~4 formalization lives in a standalone module \texttt{lean/\allowbreak Matematyka/\allowbreak Erdos132.lean} built against Mathlib \texttt{v4.37.0-rc1}. Points are modeled in \texttt{Pt := EuclideanSpace}~$\R$~\texttt{(Fin 2)}, using unordered pairs via \texttt{X.powersetCard 2} so that multiplicities match unordered edges exactly. Key definitions and structural lemmas in Part~1 (\texttt{CoreDefinitions}) and Part~2 (\texttt{Counterexample4}) include:
+\begin{itemize}
+  \item \texttt{distSet}, \texttt{PairHasDist}, \texttt{distMult}, \texttt{rareDistances}, \texttt{Erdos132For}, and \texttt{Erdos132Conjecture};
+  \item \texttt{sum\_distMult\_eq\_choose}: $\sum_{d \in D(X)} \mu(X, d) = \binom{\card{X}}{2}$;
+  \item \texttt{sum\_erase\_distMult}: $\sum_{y \in X} \mu(X \setminus \{y\}, d) = (\card{X} - 2)\,\mu(X, d)$;
+  \item \texttt{erdos132\_of\_many\_distances}: formalized pigeonhole criterion \eqref{eq:pigeonhole};
+  \item \texttt{not\_erdos132\_four}: $\neg\text{\texttt{Erdos132For}}\ 4$ constructed explicitly from the $4$-point unit rhombus \texttt{rhombus4}.
+\end{itemize}
+
+In Part~3 (\texttt{HopfPannwitz}), we give a self-contained proof of the Hopf--Pannwitz theorem~\cite{HoPa34} via planar $2$-dimensional inner products and oriented Cramer determinants: any vertex $p_0 \in X$ with three neighbors $q_1, q_2, q_3$ at distance $\Delta = \operatorname{diam}(X)$ induces unit vectors $u_1, u_2, u_3$ whose pairwise distances satisfy $\|u_i - u_j\| \le 1$, hence acute/obtuse angular bounds forcing one vector into the positive cone of the other two, whose inner product with its diameter neighbor exceeds $1$. Deleting the middle vertex and applying strong induction on $\card{X}$ establishes \texttt{diameter\_multiplicity\_le\_card} ($\mu(X, \operatorname{diam}(X)) \le \card{X}$) and \texttt{one\_le\_card\_rareDistances} for all $\card{X} \ge 2$.
+
+\section{Planar Gram Minors and Unconditional Lean~4 Proofs for \texorpdfstring{$n = 5$, $g(2) = 5$, $n = 6$}{n = 5, g(2) = 5, n = 6}}
+
+For any base point $p_0 \in \R^2$ and points $r_1, r_2, r_3, c_1, c_2, c_3 \in \R^2$, consider the doubled Gram pairing
+\[
+G(p_0; a, b) := \|a - p_0\|^2 + \|b - p_0\|^2 - \|a - b\|^2 = 2\langle a - p_0, b - p_0 \rangle.
+\]
+Since the image of $(a - p_0)$ lies in $\R^2$, any $3 \times 3$ minor
+\[
+\det\bigl(G(p_0; r_i, c_j)\bigr)_{1 \le i,j \le 3} = 0
+\]
+vanishes identically (\texttt{planar\_gram\_minor3\_eq\_zero}). Dividing all distances by the smaller distance $d_1 > 0$ transforms $2$-distance realizability with ratio $(d_2 / d_1)^2 = 1 + u$ ($u > 0$) into polynomial vanishing in $\Z[u]$ for every $10$-bit edge labeling $m \in \{0, \dots, 1023\}$ of $K_5$. Rather than relying on floating-point coordinates or interactive casework, this algebraic formulation yields completely self-contained kernel-verified Lean~4 proofs (matching the classical results of~\cite{ErFi95}):
+
+\begin{theorem}[Complete $n = 5$ classification and $g(2) = 5$]\label{thm:n5}
+All $1,024$ two-distance patterns on $5$ points (\texttt{five\_point\_two\_dist\_structure}, \texttt{erdos132\_five}, \texttt{no\_six\_point\_two\_dist}) satisfy one of two mutually exclusive algebraic certificates verified kernel-internally via \texttt{by decide} over eight $128$-mask slices (\texttt{certs5\_0}--\texttt{certs5\_7}):
+\begin{enumerate}
+  \item For exactly $12$ labeled $C_5$ masks, the $(0)$-th $3\times 3$ minor is $4 + 6u - 2u^2 - 2u^3 = -2(u+2)(u^2 - u - 1)$, forcing $(d_2/d_1)^2 = (3+\sqrt{5})/2$ and $\mu(X, d_1) = \mu(X, d_2) = 5$.
+  \item For all remaining $1,012$ non-$C_5$ masks ($966$ single-minor witnesses and $46$ two-minor B\'ezout combinations, maximum polynomial length $4$ and maximum coefficient magnitude $18$), a witness polynomial $P_m(u)$ with non-negative coefficients and at least one strictly positive coefficient vanishes, contradicting $u > 0$.
+\end{enumerate}
+Consequently, \texttt{Erdos132For 5} holds unconditionally. Moreover, no $6$-point $2$-distance set can exist (\texttt{no\_six\_point\_two\_dist}, i.e.\ $g(2) = 5$), because every $5$-point subset would satisfy $\mu(X \setminus \{y\}, d_1) = 5$, forcing $4\,\mu(X, d_1) = 6 \cdot 5 = 30$, impossible in $\N$.
+\end{theorem}
+
+For $n = 6$, \texttt{no\_six\_point\_two\_dist} gives $k \ge 3$, and \eqref{eq:pigeonhole} handles $k \ge 4$. An extremal violator at $k = 3$ has distances $a < b < D$ with multiplicities $(7, 7, 1)$, so removing a diameter endpoint $x$ (with partner $v_0$) leaves a $5$-point $C_5$ configuration with $u^2 - u - 1 = 0$, while $x$ realizes $D$ to $v_0$, $a$ to two vertices $j_1 < j_2$, and $b$ to the remaining two. Setting $v := (D/a)^2 - (b/a)^2 > 0$, each of the $5\binom{4}{2}=30$ valid triples $(t_v, j_1, j_2)$ admits a \emph{single} $3 \times 3$ Gram minor reduced modulo $u^2 = u + 1$ into $\pm(r_0(v) + u\,r_1(v))$ with non-negative, non-zero-total integer coefficients (\texttt{certs6Data}), proving \texttt{erdos132\_six} unconditionally.
+
+\section{General Regular-Polygon Moment Obstruction and \texorpdfstring{$n = 14$}{n = 14}}
+
+Let $R_m = \{v_0, \dots, v_{m-1}\}$ be the vertices $v_j = (\cos(2\pi j/m), \sin(2\pi j/m))$ of the unit regular $m$-gon ($m \ge 3$). Because $\sum_{j=0}^{m-1} e^{2\pi i k j / m} = 0$ whenever $1 \le k < m$, the first and second harmonic Fourier modes vanish simultaneously for all $m \ge 3$, yielding exact angle-independent moment formulas for every $x \in \R^2$ (\texttt{regPoly\_moment2}, \texttt{regPoly\_moment4}):
+\begin{align}
+\sum_{j=0}^{m-1} \|x - v_j\|^2 &= m\bigl(\|x\|^2 + 1\bigr), \label{eq:mom2}\\
+\sum_{j=0}^{m-1} \|x - v_j\|^4 &= m\bigl(\|x\|^4 + 4\|x\|^2 + 1\bigr). \label{eq:mom4}
+\end{align}
+
+\begin{theorem}[Moment-Inequality Obstruction]\label{thm:regpoly}
+For every integer $m \ge 4$ (\texttt{no\_regPoly\_violator\_extension}), no point $x \in \R^2$, index $j_0 \in \{0, \dots, m-1\}$, and $\Delta > 0$ can simultaneously satisfy $\|x - v_{j_0}\| = \Delta$ together with the vertex-shifted second and fourth distance moments
+\[
+\sum_{j=0}^{m-1} \|x - v_j\|^2 = \sum_{j=0}^{m-1} \|v_0 - v_j\|^2 + \Delta^2, \qquad
+\sum_{j=0}^{m-1} \|x - v_j\|^4 = \sum_{j=0}^{m-1} \|v_0 - v_j\|^4 + \Delta^4.
+\]
+\end{theorem}
+
+\begin{proof}
+Since $\|v_0\| = 1$, equations \eqref{eq:mom2}--\eqref{eq:mom4} give $m(\rho^2 + 1) = 2m + \Delta^2$ and $m(\rho^4 + 4\rho^2 + 1) = 6m + \Delta^4$ for $\rho := \|x\|$. The first equation implies $\Delta^2 = m(\rho^2 - 1) > 0$, whence $\rho^2 - 1 > 0$. Substituting into the fourth moment yields
+\[
+m(\rho^2 - 1)\bigl(\rho^2 + 5 - m(\rho^2 - 1)\bigr) = 0,
+\]
+so $(m - 1)\rho^2 = m + 5$ and $\Delta^2 = \rho^2 + 5$. On the other hand, the triangle inequality gives $\Delta = \|x - v_{j_0}\| \le \|x\| + \|v_{j_0}\| = \rho + 1$, hence
+\[
+\rho^2 + 5 = \Delta^2 \le (\rho + 1)^2 = \rho^2 + 2\rho + 1,
+\]
+forcing $\rho \ge 2$ and $\rho^2 \ge 4$. Consequently $4(m - 1) \le (m - 1)\rho^2 = m + 5$, i.e.\ $3m \le 9$, contradicting $m \ge 4$. (Notice that at $m = 3$, equality holds precisely at $\rho = 2, \Delta = 3$, recovering the unit rhombus \texttt{rhombus4}.)
+\end{proof}
+
+Combining Theorem~\ref{thm:regpoly} with even-size endpoint descent gives a uniform bridge from odd-vertex low-distance classifications to even $n = 2r + 2$:
+
+\begin{theorem}[Even-Size Endpoint Descent]\label{thm:even}
+Fix $r \ge 2$ and $n = 2r + 2$ (\texttt{erdos132\_even\_of\_classification}, specialized at $r = 6$ to \texttt{erdos132\_fourteen\_of\_wei\_and\_class13}). Assume that $g(r) \le 2r + 1$ and that every $(2r+1)$-point planar set with at most $r$ distinct distances and all multiplicities $\le 2r + 3$ is similar to $R_{2r+1}$. Then $\text{\texttt{Erdos132For}}(2r + 2)$ holds.
+\end{theorem}
+
+\begin{proof}
+Suppose $X$ with $\card{X} = 2r + 2$ violates Erd\H{o}s~\#132. By $g(r) \le 2r + 1$ and \eqref{eq:pigeonhole}, $X$ determines exactly $r + 1$ distances: a unique diameter pair $D = \|x - v_0\|$ ($\mu = 1$) and $r$ distances $S = D(X) \setminus \{D\}$ each of multiplicity $2r + 3$. Deleting $x$ leaves $Y = X \setminus \{x\}$ of size $m = 2r + 1$ with $\card{D(Y)} \le r$ and $\mu(Y, d) \le \mu(X, d) \le 2r + 3$, so $Y$ is similar to $R_m$ by hypothesis. Cyclic symmetry of $R_m$ gives uniform vertex degree $\deg_Y(d)$ satisfying $2\,\mu(Y, d) = (2r + 1)\deg_Y(d)$; boundedness $1 \le \mu(Y, d) \le 2r + 3$ and $r \ge 2$ rule out $\deg_Y(d) = 0, 1$, and $\ge 3$ ($3(2r+1) > 2(2r+3)$), forcing $\deg_Y(d) = 2$ and $\mu(Y, d) = 2r + 1$ for every $d \in D(Y)$. Double-counting $\binom{2r+1}{2} = r(2r+1)$ then forces $D(Y) = S$, whence for every $d \in S$, $x$ has exactly $2 = (2r+3) - (2r+1)$ neighbors at distance $d$ in $Y$, matching the fiber degree of any vertex of $Y$. Pulling back to $R_m$ by Euclidean similarity gives an extension violating Theorem~\ref{thm:regpoly} ($m = 2r + 1 \ge 5 \ge 4$).
+\end{proof}
+
+\begin{corollary}[Resolution of $n = 14$]\label{cor:n14}
+Taking $r = 6$ ($n = 14$, $m = 13$) in Theorem~\ref{thm:even}, Wei's theorem~\cite{We12} supplies $g(6) = 13$, and any hypothetical $14$-point violator descends to a $13$-point $\le 6$-distance set $Y$ with $\mu(Y, d) \le 15$ for all $d \in D(Y)$. Among the classified $13$-point $6$-distance spectra---namely $R_{13}$ with $(13^6)$, $R_{12}^+$ with $(24, 12^4, 6)$, and the centered hexagram with $(24, 18, 15, 12, 6, 3)$---both non-$R_{13}$ families are immediately excluded since $24 > 15$, without requiring any $14$-point $7$-distance classification. The remaining case $R_{13}$ is eliminated by Theorem~\ref{thm:regpoly} ($3 \cdot 13 = 39 > 9$). The same mechanism unifies $n = 8$ ($r = 3$, $m = 7$) and $n = 10$ ($r = 4$, $m = 9$).
+\end{corollary}
+
+\section{Empirical Census and Numerical Verification}
+
+Beyond the exact algebraic and Lean proofs above, \texttt{scripts/\allowbreak scan\_erdos\_132.py} performs symbolic (\texttt{SymPy}) and $80$-digit (\texttt{mpmath}) verification of \eqref{eq:mom2}--\eqref{eq:mom4} and the positive triangle-inequality violation gap $\delta_{\mathrm{crit}} - (\rho_{\mathrm{crit}} + 1)$ for $3 \le m \le 25$, confirming the algebraic factor
+\[
+\bigl(\delta_{\mathrm{crit}}^2 - \rho_{\mathrm{crit}}^2 - 1\bigr)^2 - 4\rho_{\mathrm{crit}}^2 = \frac{12(m - 3)}{m - 1}
+\]
+and surveying rare distances across three planar configuration families up to $n = 79$:
+
+\begin{center}
+\footnotesize
+\begin{tabular}{llrrr}
+\toprule
+Family & Range & $\card{D(X)}$ & $\mu(X, \mathrm{diam})$ & $\card{\mathcal{R}(X)}$ \\
+\midrule
+Triangular lattice disks & $n = 5 \dots 79$ & $3 \dots 31$ & $1$ & $2 \dots 14$ \\
+Resonant ring + patch & $n = 35 \dots 67$ & $95 \dots 117$ & $4 \dots 12$ & $93 \dots 115$ \\
+Regular $R_m$ and $R_m^+$ & $n = 5 \dots 16$ & $2 \dots 8$ & $5 \dots 15$ & $2 \dots 8$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section{Reproducibility and Axiom Verification}
+
+All computational certificates (\texttt{data/\allowbreak erdos\_132\_certificates.json}), verification tests (\texttt{tests/\allowbreak test\_erdos\_132.py}), and Lean~4 proofs (\texttt{lean/\allowbreak Matematyka/\allowbreak Erdos132.lean}) are self-contained and reproducible from the repository root:
+\begin{verbatim}
+.venv/bin/python scripts/scan_erdos_132.py --self-test
+cd lean && lake env lean Matematyka/Erdos132.lean
+.venv/bin/python tools/council_cli.py lean-check \
+  Matematyka/Erdos132.lean --timeout 300
+.venv/bin/pytest tests/test_erdos_132.py -q
+\end{verbatim}
+Every exported theorem depends strictly on Lean's three foundational axioms \texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound}, with zero \texttt{sorry}, zero \texttt{admit}, zero \texttt{native\_decide}, zero \texttt{bv\_decide}, and zero custom axioms.
+
+\begin{thebibliography}{99}
+
+\bibitem{Bl26}
+T.~F. Bloom, \emph{Erd\H{o}s Problem \#132}, \url{https://www.erdosproblems.com/132}, accessed November 2026.
+
+\bibitem{CDL25}
+F.~Clemen, A.~Dumitrescu, and D.~Liu, \emph{On multiplicities of interpoint distances}, arXiv:2505.04283 (2025).
+
+\bibitem{Er84c}
+P.~Erd\H{o}s, \emph{Some old and new problems in combinatorial geometry}, Convexity and graph theory (Jerusalem, 1981), North-Holland Math.\ Stud.\ 87 (1984), 129--136.
+
+\bibitem{Er97b}
+P.~Erd\H{o}s, \emph{Some old and new problems in various branches of combinatorics}, Discrete Math.\ 165/166 (1997), 227--231.
+
+\bibitem{Er97e}
+P.~Erd\H{o}s, \emph{Some of my favourite unsolved problems}, Math.\ Japon.\ 46 (1997), 527--537.
+
+\bibitem{ErFi95}
+P.~Erd\H{o}s and P.~C. Fishburn, \emph{Multiplicities of interpoint distances in finite planar sets}, Discrete Appl.\ Math.\ 60 (1995), 141--147.
+
+\bibitem{ErPa90}
+P.~Erd\H{o}s and J.~Pach, \emph{Variations on the theme of repeated distances}, Combinatorica 10 (1990), 261--269.
+
+\bibitem{HoPa34}
+H.~Hopf and E.~Pannwitz, \emph{Aufgabe 167}, Jber.\ Deutsch.\ Math.\ Verein.\ 43 (1934), 114.
+
+\bibitem{We12}
+X.~Wei, \emph{A proof of Erd\H{o}s--Fishburn's conjecture for $g(6)=13$}, Electron.\ J.\ Combin.\ 19 (2012).
+
+\end{thebibliography}
+
+\end{document}

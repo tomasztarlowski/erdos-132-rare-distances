@@ -1,0 +1,16 @@
+name = "erdos132"
+version = "0.1.0"
+keywords = ["math", "erdos", "lean4", "geometry"]
+defaultTargets = ["Matematyka"]
+
+[leanOptions]
+pp.unicode.fun = true
+
+[[require]]
+name = "mathlib"
+scope = "leanprover-community"
+rev = "v4.37.0-rc1"
+
+[[lean_lib]]
+name = "Matematyka"
+roots = ["Matematyka.Erdos132"]

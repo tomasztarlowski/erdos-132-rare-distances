@@ -1,0 +1,9 @@
+.lake/
+.venv/
+__pycache__/
+.pytest_cache/
+*.olean
+*.ilean
+*.c
+*.trace
+.DS_Store
