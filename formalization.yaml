@@ -14,11 +14,11 @@ project:
     all 1,024 K_5 edge 2-colorings and all 30 symmetric (1,7,7) 6-point extensions
     (fc_erdos_fishburn); and (5) a general m >= 4 regular-polygon 2nd/4th-moment obstruction
     theorem (no_regPoly_violator_extension, reducing impossibility to 3m > 9). Combining even-size
-    endpoint descent with this moment obstruction yields fc_fourteen_of_wei_and_class13, which
-    closes the previously open n = 14 barrier conditional on two explicit arguments: Wei's bound
-    g(6) = 13 and the 13-point <= 6-distance classification restricted to multiplicities <= 15
-    (where 24 > 15 eliminates R_{12}^+ and the centered hexagram, leaving R_{13}). The full
-    conjecture for arbitrary n >= 5 and the asymptotic growth question remain open.
+    endpoint descent with this unconditional moment obstruction yields fc_fourteen_of_wei_and_class13,
+    which establishes a conditional reduction for n = 14 depending on two explicit hypotheses not proved
+    here: Wei's bound g(6) = 13 (hwei) and the unproved 13-point <= 6-distance classification
+    restricted to multiplicities <= 15 (hclass13). Both an unconditional resolution of n = 14 and the
+    full conjecture for arbitrary n >= 5 (with the asymptotic growth question) remain open.
   authors:
     - "Tomasz Tarłowski"
   responsible_maintainers:
@@ -31,16 +31,18 @@ classification:
   msc2020: ["52C10", "05D99", "68V20"]
 
 sources:
-  - title: "Lean 4 Formalization of Erdős Problem #132 and a Regular-Polygon Moment Obstruction Closing n=14"
+  - title: "Lean 4 Formalization of Erdős Problem #132 and a Conditional Regular-Polygon Moment Reduction for n=14"
     authors:
       - "Tomasz Tarłowski"
     id: "https://github.com/tomasztarlowski/erdos-132-rare-distances/blob/main/paper/erdos_132_rare_distances.pdf"
     type: "paper"
     relationship: "formalizes"
     note: >-
-      Companion preprint by the author presenting the regular-polygon moment obstruction for m >= 4,
-      even-size descent for n = 2r + 2 (closing n = 14), and kernel-checked Gram-minor certificates
-      for n = 5 and n = 6. Archived with permanent Zenodo DOI https://doi.org/10.5281/zenodo.24442667.
+      Companion preprint by the author presenting the unconditional regular-polygon moment obstruction
+      for m >= 4, conditional even-size descent for n = 2r + 2 (reducing n = 14 to Wei's g(6) = 13
+      hypothesis and the unproved 13-point <= 6-distance classification hypothesis under multiplicity
+      <= 15), and kernel-checked Gram-minor certificates for n = 5 and n = 6. Archived with permanent
+      Zenodo DOI https://doi.org/10.5281/zenodo.24442667.
     author_endorsement: "participated"
   - title: "Multiplicities of interpoint distances in finite planar sets"
     authors:
@@ -108,8 +110,8 @@ related_formalizations:
     relationship: "adapts"
     note: >-
       FormalConjecturesBridge uses the exact distanceMultiplicity and lowMultiplicityDistances
-      definitions of PR #4389, supplying machine-checked proofs for the sorry'd hopf_pannwitz,
-      four_points, and erdos_fishburn statements plus n = 14.
+      definitions of PR #4389, supplying unconditional machine-checked proofs for the sorry'd
+      hopf_pannwitz, four_points, and erdos_fishburn statements plus the conditional n = 14 reduction.
   - id: "https://github.com/AItoBit/erdos-132-lean"
     relationship: "independent"
     note: "Independent formalization of the n = 4 rhombus counterexample only."
@@ -125,8 +127,10 @@ status:
     Formalized and proved unconditionally: Hopf–Pannwitz (fc_hopf_pannwitz), n = 4 sharpness
     (fc_four_points), g(2) = 5 (no_six_point_two_dist), n = 5 and n = 6 (fc_erdos_fishburn),
     and the m >= 4 regular-polygon moment obstruction (no_regPoly_violator_extension). Proved
-    conditionally on explicit hypotheses hwei and hclass13: n = 14 (fc_fourteen_of_wei_and_class13).
-    The general conjecture for arbitrary n >= 5 remains open.
+    conditionally on explicit unproved hypotheses hwei (Wei's g(6) = 13) and hclass13 (13-point
+    <= 6-distance classification with multiplicities <= 15): n = 14 reduction
+    (fc_fourteen_of_wei_and_class13). Both n = 14 unconditionally and the general conjecture for
+    arbitrary n >= 5 remain open.
   sorry_count: 0
   sorry_in_definitions: 0
   axioms: ["propext", "Quot.sound", "Classical.choice"]

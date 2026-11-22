@@ -2975,11 +2975,13 @@ theorem erdos132_ten_of_g4_and_class9
     Erdos132For 10 :=
   erdos132_even_of_classification (by omega : 2 ≤ 4) hg4 hclass9
 
-/-- **Resolution of the `n = 14` Barrier (`r = 6`, `m = 13`):**
-For `n = 14`, Wei (2012) gives `g(6) = 13`, and any violator forces `13`-point `≤ 6`-distance sets `Y`
-with every multiplicity `≤ 15` (immediately eliminating `R_{12}^+` spectrum `(24, 12^4, 6)` and
-the centered hexagram spectrum `(24, 18, 15, 12, 6, 3)` since `24 > 15`). Together with the remaining
-regular `13`-gon classification `IsSimilarRegPoly 13 Y`, the `m = 13` moment obstruction closes `n = 14`. -/
+/-- **Conditional Reduction for `n = 14` (`r = 6`, `m = 13`):**
+For `n = 14`, assuming Wei's bound `g(6) = 13` (`hwei`) and the unproved classification hypothesis
+`hclass13` (`13`-point `≤ 6`-distance sets with every multiplicity `≤ 15` are similar to `R_13`),
+even-size endpoint descent together with the unconditional `m = 13` moment obstruction implies
+`Erdos132For 14`. Neither `hwei` nor `hclass13` is proved in this repository (although known
+non-`R_13` spectra `R_{12}^+` `(24, 12^4, 6)` and centered hexagram `(24, 18, 15, 12, 6, 3)`
+violate `≤ 15`), so `n = 14` unconditionally remains open. -/
 theorem erdos132_fourteen_of_wei_and_class13
     (hwei : ∀ X : Finset Pt, X.card = 14 → 7 ≤ (distSet X).card)
     (hclass13 : ∀ Y : Finset Pt, Y.card = 13 → (distSet Y).card ≤ 6 →
@@ -3143,7 +3145,7 @@ theorem fc_erdos_fishburn (P : Finset Pt) (hP : P.card = 5 ∨ P.card = 6) :
   · exact erdos132_five P h5
   · exact erdos132_six P h6
 
-/-- Formal proof of the `n = 14` barrier via the regular-13-gon moment obstruction, stated in PR #4389 API. -/
+/-- Conditional reduction for `n = 14` (assuming explicit hypotheses `hwei` and `hclass13`) via the regular-13-gon moment obstruction, stated in PR #4389 API. -/
 theorem fc_fourteen_of_wei_and_class13 (P : Finset Pt) (hP : P.card = 14)
     (hwei : ∀ X : Finset Pt, X.card = 14 → 7 ≤ (distSet X).card)
     (hclass13 : ∀ Y : Finset Pt, Y.card = 13 → (distSet Y).card ≤ 6 →

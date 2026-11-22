@@ -5,7 +5,7 @@ public import Mathlib
 @[expose] public section
 
 /-!
-# Challenge: Erdős Problem #132 — Formal Proofs and Moment Obstruction Closing `n = 14`
+# Challenge: Erdős Problem #132 — Unconditional Proofs (`n ≤ 6`) and Conditional Moment Reduction for `n = 14`
 
 This lightweight Challenge module declares the planar distance definitions and the six compared
 theorems on **Erdős Problem #132** (`https://www.erdosproblems.com/132`). Proofs are supplied in
@@ -16,11 +16,11 @@ standard axioms `{propext, Quot.sound, Classical.choice}`.
 - `fc_hopf_pannwitz`, `fc_four_points`, `no_six_point_two_dist`, `fc_erdos_fishburn`, and
   `no_regPoly_violator_extension` are **unconditional** theorems.
 - `fc_fourteen_of_wei_and_class13` establishes the `n = 14` case **conditional** on two explicit
-  literature hypotheses passed as arguments: Wei's bound `g(6) = 13` (`hwei`) and the regular
-  `13`-gon classification for `13`-point `≤ 6`-distance sets with all multiplicities `≤ 15`
-  (`hclass13`).
-- The full Erdős Problem #132 conjecture for arbitrary `n ≥ 5` (and its growth question) remains
-  **open**.
+  unproved hypotheses passed as arguments: Wei's bound `g(6) = 13` (`hwei`) and the regular
+  `13`-gon classification hypothesis for `13`-point `≤ 6`-distance sets with all multiplicities
+  `≤ 15` (`hclass13`). Neither hypothesis is proved in this repository.
+- Both an unconditional proof of `n = 14` and the full Erdős Problem #132 conjecture for
+  arbitrary `n ≥ 5` (with its growth question) remain **open**.
 
 ## Sources
 - Erdős, *Some of my favourite unsolved problems*, Math. Japon. 46 (1997), 527–537 (`[Er97e]`).
@@ -113,9 +113,9 @@ theorem no_regPoly_violator_extension {m : ℕ} (hm : 4 ≤ m) (x : Pt) (j₀ : 
     False := by
   sorry
 
-/-- Resolution of the `n = 14` barrier via the `m = 13` moment obstruction and even-size
-endpoint descent, conditional on Wei's `g(6) = 13` bound (`hwei`) and the regular `13`-gon
-classification (`hclass13`). -/
+/-- Conditional reduction for `n = 14` via the `m = 13` moment obstruction and even-size
+endpoint descent, explicitly conditional on Wei's `g(6) = 13` hypothesis (`hwei`) and the
+unproved regular `13`-gon classification hypothesis (`hclass13`). -/
 theorem fc_fourteen_of_wei_and_class13 (P : Finset Pt) (hP : P.card = 14)
     (hwei : ∀ X : Finset Pt, X.card = 14 → 7 ≤ (distSet X).card)
     (hclass13 : ∀ Y : Finset Pt, Y.card = 13 → (distSet Y).card ≤ 6 →
