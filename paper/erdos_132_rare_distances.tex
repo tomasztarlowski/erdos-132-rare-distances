@@ -31,12 +31,13 @@
 \begin{document}
 
 \begin{abstract}
-Let $X \subset \R^2$ be a finite set of $n$ points, and write $\mu(X, d)$ for the number of unordered pairs in $X$ at Euclidean distance $d > 0$. Erd\H{o}s and Pach~\cite{Er84c,ErPa90,ErFi95,Er97e} conjectured that for every $n \ge 5$, $X$ must determine at least two distinct distances $d$ satisfying $1 \le \mu(X, d) \le n$, with Erd\H{o}s offering \$100 in~\cite{Er97e} for any nontrivial result toward this problem. While Erd\H{o}s and Fishburn~\cite{ErFi95} settled $n = 5, 6$ and Clemen, Dumitrescu, and Liu~\cite{CDL25} settled convex sets, no machine-checked formalization existed on the Erd\H{o}s Problems database~\cite{Bl26}, and recent small-$n$ analyses halted at $n = 13$ under the assumption that $n = 14$ required classifying $14$-point $7$-distance sets.
+Let $X \subset \R^2$ be a finite set of $n$ points, and write $\mu(X, d)$ for the number of unordered pairs in $X$ at Euclidean distance $d > 0$. Erd\H{o}s and Pach~\cite{Er84c,ErPa90,ErFi95,Er97e} conjectured that for every $n \ge 5$, $X$ must determine at least two distinct distances $d$ satisfying $1 \le \mu(X, d) \le n$, with Erd\H{o}s offering \$100 in~\cite{Er97e} for any nontrivial result toward this problem. While Erd\H{o}s and Fishburn~\cite{ErFi95} settled $n = 5, 6$, Clemen, Dumitrescu, and Liu~\cite{CDL25} settled convex sets, and Marche~\cite{Ma26} resolved $7 \le n \le 13$, no accepted formalized statement yet lives on the Erd\H{o}s Problems database~\cite{Bl26} (beyond pending PR~\#4389 in \texttt{google-deepmind/\allowbreak formal-conjectures}, where Hopf--Pannwitz and $n = 5, 6$ remain unproven), and existing analyses halted at $n = 13$ under the assumption that $n = 14$ required classifying $14$-point $7$-distance sets.
 
-We present a complete, axiom-clean Lean~4 and Mathlib formalization (\texttt{Matematyka/Erdos132.lean}, depending solely on the three standard axioms \texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}) together with a new general analytic-geometric obstruction. Specifically:
+We present a complete, axiom-clean Lean~4 and Mathlib formalization (\texttt{Matematyka/\allowbreak Erdos132.lean}, depending solely on the three standard axioms \texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}) together with a new general analytic-geometric obstruction. Specifically:
 \begin{enumerate}
   \item We formalize \texttt{Erdos132Conjecture} and prove the sharp boundary \texttt{not\_erdos132\_four} via the $4$-point unit rhombus, alongside an unconditional proof of the Hopf--Pannwitz diameter theorem~\cite{HoPa34} (\texttt{diameter\_multiplicity\_le\_card}).
   \item Using exact $3 \times 3$ planar Gram minors and rational-free integer Positivstellensatz witnesses verified inside the Lean kernel across all $1,024$ edge two-colorings of $K_5$ ($12$ labeled $C_5$ patterns forcing golden-ratio edge squares, $1,012$ refuted patterns) and all $30$ symmetric $(1,7,7)$ extensions on $6$ vertices, we give the first unconditional machine-checked Lean~4 proofs of $g(2) = 5$ (\texttt{no\_six\_point\_two\_dist}) and Erd\H{o}s~\#132 for $n = 5$ and $n = 6$ (\texttt{erdos132\_five}, \texttt{erdos132\_six}).
+  \item Via \texttt{FormalConjecturesBridge} (\texttt{fc\_hopf\_pannwitz}, \texttt{fc\_four\_points}, \texttt{fc\_erdos\_fishburn}, \texttt{fc\_\allowbreak fourteen\_\allowbreak of\_\allowbreak wei\_\allowbreak and\_\allowbreak class13}), all proved results are restated in the exact \texttt{distance\allowbreak Multiplicity} / \texttt{low\allowbreak Multiplicity\allowbreak Distances} API of \texttt{google-deepmind/\allowbreak formal-conjectures} PR~\#4389.
   \item We prove a new general second- and fourth-moment inequality obstruction (\texttt{no\_regPoly\_violator\_extension}): for every $m \ge 4$, no planar point $x$ outside a regular $m$-gon $R_m$ can absorb an $(m, m, \dots, m)$-type distance degree signature with a single diameter pair, reducing the threshold to $3m > 9$ (exact equality holds at $m = 3$ for the rhombus).
   \item Combining even-size endpoint descent ($\binom{2r+2}{2} = 1 + r(2r+3)$) with our moment obstruction (\texttt{erdos132\_even\_of\_classification}), we unify the even cases $n = 8, 10, 14$ and resolve the open $n = 14$ barrier ($r = 6$, $m = 13$, via Wei's theorem $g(6) = 13$~\cite{We12}), since the $(2r+3)=15$ multiplicity ceiling automatically discards the $R_{12}^+$ and centered hexagram $13$-point $6$-distance families ($24 > 15$) and $m = 13$ satisfies $3 \cdot 13 = 39 > 9$.
 \end{enumerate}
@@ -77,7 +78,7 @@ Since $k \ge g^{-1}(n)$ where $g(r)$ denotes the maximum number of points in $\R
 \]
 Consequently, knowing $g(r) \le 2r + 1$ (so $k \ge r + 1$) hits exact equality in \eqref{eq:pigeonhole} and leaves an isolated extremal class in which the diameter occurs \emph{once} and every other distance $d \in D(X) \setminus \{\Delta\}$ has multiplicity \emph{exactly} $2r + 3 = n + 1$.
 
-Recent small-$n$ notes halted at $n = 13$ because no structural exclusion handled $n = 14$ ($r = 6$) cleanly; indeed, Remark~5 of July~2026 notes on Erd\H{o}s~\#132 stated that $n = 14$ lay beyond existing classifications because it appeared to require $14$-point $7$-distance sets. In this paper we resolve that obstacle cleanly by combining endpoint deletion ($14 \to 13$) with a new general $m \ge 4$ regular-polygon moment-inequality theorem, and we provide a complete Lean~4 formalization of the problem statement together with unconditional formal proofs for $n = 4, 5, 6$, Hopf--Pannwitz, and the even-size reduction.
+Recent small-$n$ notes by Marche~\cite{Ma26} settled $7 \le n \le 13$, halting at $n = 13$ because no structural exclusion handled $n = 14$ ($r = 6$) cleanly; indeed, Remark~5 of~\cite{Ma26} observed that $n = 14$ lay beyond existing classifications because it appeared to require classifying $14$-point $7$-distance sets. In this paper we resolve that obstacle cleanly by combining endpoint deletion ($14 \to 13$) with a new general $m \ge 4$ regular-polygon moment-inequality theorem, and we provide complete unconditional Lean~4 formal proofs for $n = 4, 5, 6$, Hopf--Pannwitz, and the even-size reduction, bridged directly to \texttt{google-deepmind/\allowbreak formal-conjectures} PR~\#4389.
 
 \section{Formalization Architecture in Lean~4}
 
@@ -91,6 +92,8 @@ Our Lean~4 formalization lives in a standalone module \texttt{lean/\allowbreak M
 \end{itemize}
 
 In Part~3 (\texttt{HopfPannwitz}), we give a self-contained proof of the Hopf--Pannwitz theorem~\cite{HoPa34} via planar $2$-dimensional inner products and oriented Cramer determinants: any vertex $p_0 \in X$ with three neighbors $q_1, q_2, q_3$ at distance $\Delta = \operatorname{diam}(X)$ induces unit vectors $u_1, u_2, u_3$ whose pairwise distances satisfy $\|u_i - u_j\| \le 1$, hence acute/obtuse angular bounds forcing one vector into the positive cone of the other two, whose inner product with its diameter neighbor exceeds $1$. Deleting the middle vertex and applying strong induction on $\card{X}$ establishes \texttt{diameter\_multiplicity\_le\_card} ($\mu(X, \operatorname{diam}(X)) \le \card{X}$) and \texttt{one\_le\_card\_rareDistances} for all $\card{X} \ge 2$.
+
+Finally, Part~6 (\texttt{FormalConjecturesBridge}) defines \texttt{distance\allowbreak Multiplicity} (via \texttt{P.offDiag}) and \texttt{low\allowbreak Multiplicity\allowbreak Distances} (as a \texttt{Set}~$\R$ with \texttt{Set.ncard}) verbatim from \texttt{google-deepmind/\allowbreak formal-conjectures} PR~\#4389, proves exact equivalence (\texttt{distance\allowbreak Multiplicity\_\allowbreak eq\_\allowbreak distMult}, \texttt{low\allowbreak Multiplicity\allowbreak Distances\_\allowbreak ncard}), and exports kernel-verified proofs \texttt{fc\_hopf\_pannwitz}, \texttt{fc\_four\_points}, \texttt{fc\_erdos\_fishburn} ($n = 5, 6$), and \texttt{fc\_\allowbreak fourteen\_\allowbreak of\_\allowbreak wei\_\allowbreak and\_\allowbreak class13}.
 
 \section{Planar Gram Minors and Unconditional Lean~4 Proofs for \texorpdfstring{$n = 5$, $g(2) = 5$, $n = 6$}{n = 5, g(2) = 5, n = 6}}
 
@@ -159,7 +162,7 @@ Taking $r = 6$ ($n = 14$, $m = 13$) in Theorem~\ref{thm:even}, Wei's theorem~\ci
 
 \section{Empirical Census and Numerical Verification}
 
-Beyond the exact algebraic and Lean proofs above, \texttt{scripts/\allowbreak scan\_erdos\_132.py} performs symbolic (\texttt{SymPy}) and $80$-digit (\texttt{mpmath}) verification of \eqref{eq:mom2}--\eqref{eq:mom4} and the positive triangle-inequality violation gap $\delta_{\mathrm{crit}} - (\rho_{\mathrm{crit}} + 1)$ for $3 \le m \le 25$, confirming the algebraic factor
+Beyond the exact algebraic and Lean proofs above, \texttt{scripts/\allowbreak scan\_\allowbreak erdos\_\allowbreak 132.py} performs symbolic (\texttt{SymPy}) and $80$-digit (\texttt{mpmath}) verification of \eqref{eq:mom2}--\eqref{eq:mom4} and the positive triangle-inequality violation gap $\delta_{\mathrm{crit}} - (\rho_{\mathrm{crit}} + 1)$ for $3 \le m \le 25$, confirming the algebraic factor
 \[
 \bigl(\delta_{\mathrm{crit}}^2 - \rho_{\mathrm{crit}}^2 - 1\bigr)^2 - 4\rho_{\mathrm{crit}}^2 = \frac{12(m - 3)}{m - 1}
 \]
@@ -180,15 +183,19 @@ Regular $R_m$ and $R_m^+$ & $n = 5 \dots 16$ & $2 \dots 8$ & $5 \dots 15$ & $2 \
 
 \section{Reproducibility and Axiom Verification}
 
-All computational certificates (\texttt{data/\allowbreak erdos\_132\_certificates.json}), verification tests (\texttt{tests/\allowbreak test\_erdos\_132.py}), and Lean~4 proofs (\texttt{lean/\allowbreak Matematyka/\allowbreak Erdos132.lean}) are self-contained and reproducible from the repository root:
+All computational certificates (\texttt{data/\allowbreak erdos\_\allowbreak 132\_\allowbreak certificates.json}), verification tests (\texttt{tests/\allowbreak test\_erdos\_132.py}), and Lean~4 proofs (\texttt{Matematyka/\allowbreak Erdos132.lean}, located at \texttt{lean/\allowbreak Matematyka/\allowbreak Erdos132.lean} in the development workspace) are publicly archived at
+\begin{center}
+\url{https://github.com/tomasztarlowski/erdos-132-rare-distances}
+\end{center}
+and are self-contained and reproducible:
 \begin{verbatim}
-.venv/bin/python scripts/scan_erdos_132.py --self-test
-cd lean && lake env lean Matematyka/Erdos132.lean
-.venv/bin/python tools/council_cli.py lean-check \
-  Matematyka/Erdos132.lean --timeout 300
-.venv/bin/pytest tests/test_erdos_132.py -q
+python3 scripts/scan_erdos_132.py --self-test
+lake env lean Matematyka/Erdos132.lean
 \end{verbatim}
-Every exported theorem depends strictly on Lean's three foundational axioms \texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound}, with zero \texttt{sorry}, zero \texttt{admit}, zero \texttt{native\_decide}, zero \texttt{bv\_decide}, and zero custom axioms.
+The full axiom audit and test suite also run via \texttt{.venv/\allowbreak bin/\allowbreak python tools/\allowbreak council\_cli.py lean-check Matematyka/\allowbreak Erdos132.lean} and \texttt{.venv/\allowbreak bin/\allowbreak pytest tests/\allowbreak test\_erdos\_132.py -q}. Every exported theorem depends strictly on Lean's three foundational axioms \texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound}, with zero \texttt{sorry}, zero \texttt{admit}, zero \texttt{native\_decide}, zero \texttt{bv\_decide}, and zero custom axioms.
+
+\subsection*{AI Assistance Disclosure}
+Proof exploration, computational certificate generation, Lean~4 proof engineering, and manuscript drafting were carried out with assistance from AI coding tools. Every mathematical step, reference, and Lean~4 theorem was reviewed by the author and independently verified by the Lean~4 kernel, symbolic computation (\texttt{SymPy}), and $80$-digit arithmetic (\texttt{mpmath}).
 
 \begin{thebibliography}{99}
 
@@ -215,6 +222,9 @@ P.~Erd\H{o}s and J.~Pach, \emph{Variations on the theme of repeated distances}, 
 
 \bibitem{HoPa34}
 H.~Hopf and E.~Pannwitz, \emph{Aufgabe 167}, Jber.\ Deutsch.\ Math.\ Verein.\ 43 (1934), 114.
+
+\bibitem{Ma26}
+Marche, \emph{On distances of low multiplicity: the cases $7 \le n \le 13$ of a problem of Erd\H{o}s}, \url{https://github.com/JuanMarchetto/erdos-132-note}, July 2026.
 
 \bibitem{We12}
 X.~Wei, \emph{A proof of Erd\H{o}s--Fishburn's conjecture for $g(6)=13$}, Electron.\ J.\ Combin.\ 19 (2012).

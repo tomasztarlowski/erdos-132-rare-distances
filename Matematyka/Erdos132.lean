@@ -564,7 +564,7 @@ private lemma unit_cone_unique_neighbor {u_a u_b u_m w : Pt} {α β : ℝ}
     nlinarith [sq_nonneg ‖w‖]
   exact norm_eq_zero.mp (sq_eq_zero_iff.mp hw0)
 
-private lemma two_mul_edgeCount_eq_sum_deg (Y : Finset Pt) (D : ℝ) (hD : 0 < D) :
+lemma two_mul_edgeCount_eq_sum_deg (Y : Finset Pt) (D : ℝ) (hD : 0 < D) :
     2 * ((Y.powersetCard 2).filter (PairHasDist D)).card =
       ∑ p ∈ Y, (Y.filter (fun q => dist p q = D)).card := by
   induction Y using Finset.induction_on with
@@ -641,7 +641,7 @@ private lemma two_mul_edgeCount_eq_sum_deg (Y : Finset Pt) (D : ℝ) (hD : 0 < D
     rw [hfil_a, hsum_s, Nat.mul_add, ih]
     omega
 
-private lemma hopf_pannwitz_aux :
+lemma hopf_pannwitz_aux :
     ∀ n : ℕ, ∀ Y : Finset Pt, Y.card = n → ∀ D : ℝ, 0 < D →
       (∀ x ∈ Y, ∀ y ∈ Y, dist x y ≤ D) →
       ((Y.powersetCard 2).filter (PairHasDist D)).card ≤ Y.card := by
@@ -2982,5 +2982,170 @@ theorem erdos132_fourteen_of_wei_and_class13
   erdos132_even_of_classification (by omega : 2 ≤ 6) hwei hclass13
 
 end RegularPolygonObstruction
+
+/-! ## Part 6: Compatibility Bridge for `google-deepmind/formal-conjectures` PR #4389 -/
+
+section FormalConjecturesBridge
+
+/-- Number of unordered pairs of distinct points of `P` at distance `d` (matching the definition
+in `google-deepmind/formal-conjectures` PR #4389). -/
+noncomputable def distanceMultiplicity (P : Finset Pt) (d : ℝ) : ℕ :=
+  (P.offDiag.filter fun p => dist p.1 p.2 = d).card / 2
+
+/-- Set of distances occurring in `P` at least once and between at most `P.card` pairs (matching
+the definition in `google-deepmind/formal-conjectures` PR #4389). -/
+noncomputable def lowMultiplicityDistances (P : Finset Pt) : Set ℝ :=
+  {d | 0 < distanceMultiplicity P d ∧ distanceMultiplicity P d ≤ P.card}
+
+lemma distanceMultiplicity_eq_distMult (P : Finset Pt) (d : ℝ) :
+    distanceMultiplicity P d = distMult P d := by
+  by_cases hd : 0 < d
+  · have hsplit :
+        P.offDiag.filter (fun p => dist p.1 p.2 = d) =
+          P.biUnion (fun p => (P.filter fun q => dist p q = d).image (fun q => (p, q))) := by
+      ext ⟨p, q⟩
+      simp only [Finset.mem_filter, Finset.mem_offDiag, Finset.mem_biUnion, Finset.mem_image]
+      constructor
+      · rintro ⟨⟨hp, hq, _⟩, hpq⟩
+        exact ⟨p, hp, q, ⟨hq, hpq⟩, rfl⟩
+      · rintro ⟨a, ha, b, ⟨hb, hab⟩, hpair⟩
+        rcases Prod.ext_iff.mp hpair with ⟨rfl, rfl⟩
+        have hne : a ≠ b := by
+          rintro rfl
+          rw [dist_self] at hab
+          exact ne_of_lt hd hab
+        exact ⟨⟨ha, hb, hne⟩, hab⟩
+    have hcard :
+        (P.offDiag.filter (fun p => dist p.1 p.2 = d)).card =
+          ∑ p ∈ P, (P.filter (fun q => dist p q = d)).card := by
+      rw [hsplit, Finset.card_biUnion]
+      · refine Finset.sum_congr rfl ?_
+        intro p _
+        refine Finset.card_image_of_injective _ ?_
+        intro q₁ q₂ hq
+        exact (Prod.ext_iff.mp hq).2
+      · intro p₁ _ p₂ _ hne
+        change Disjoint _ _
+        rw [Finset.disjoint_left]
+        rintro ⟨x, y⟩ hx hy
+        simp only [Finset.mem_image, Finset.mem_filter] at hx hy
+        obtain ⟨q₁, _, hq₁⟩ := hx
+        obtain ⟨q₂, _, hq₂⟩ := hy
+        have h1 : p₁ = x := (Prod.ext_iff.mp hq₁).1
+        have h2 : p₂ = x := (Prod.ext_iff.mp hq₂).1
+        exact hne (h1.trans h2.symm)
+    unfold distanceMultiplicity distMult
+    rw [hcard, ← two_mul_edgeCount_eq_sum_deg P d hd]
+    omega
+  · have h1 : P.offDiag.filter (fun p => dist p.1 p.2 = d) = ∅ := by
+      rw [Finset.eq_empty_iff_forall_notMem]
+      rintro ⟨p, q⟩ hmem
+      simp only [Finset.mem_filter, Finset.mem_offDiag] at hmem
+      have hpos : 0 < dist p q := dist_pos.mpr hmem.1.2.2
+      exact hd (hmem.2 ▸ hpos)
+    have h2 : (P.powersetCard 2).filter (PairHasDist d) = ∅ := by
+      rw [Finset.eq_empty_iff_forall_notMem]
+      intro s hs
+      simp only [Finset.mem_filter, Finset.mem_powersetCard] at hs
+      obtain ⟨p, q, hpq, rfl⟩ := Finset.card_eq_two.mp hs.1.2
+      have hd_eq : dist p q = d := (pairHasDist_pair_iff hpq d).mp hs.2
+      exact hd (hd_eq ▸ dist_pos.mpr hpq)
+    unfold distanceMultiplicity distMult
+    rw [h1, h2]
+    simp
+
+lemma lowMultiplicityDistances_eq_coe_rareDistances (P : Finset Pt) :
+    lowMultiplicityDistances P = (rareDistances P : Set ℝ) := by
+  ext d
+  simp only [lowMultiplicityDistances, Set.mem_ofPred_eq, Finset.mem_coe,
+    rareDistances, Finset.mem_filter, distanceMultiplicity_eq_distMult]
+  constructor
+  · rintro ⟨hpos, hle⟩
+    refine ⟨?_, hle⟩
+    by_contra hnot
+    have heq : (P.powersetCard 2).filter (PairHasDist d) = ∅ := by
+      rw [Finset.eq_empty_iff_forall_notMem]
+      intro s hs
+      simp only [Finset.mem_filter, Finset.mem_powersetCard] at hs
+      obtain ⟨p, q, hpq, rfl⟩ := Finset.card_eq_two.mp hs.1.2
+      have hpP : p ∈ P := hs.1.1 (Finset.mem_insert_self _ _)
+      have hqP : q ∈ P := hs.1.1 (Finset.mem_insert_of_mem (Finset.mem_singleton_self _))
+      have hd_eq : dist p q = d := (pairHasDist_pair_iff hpq d).mp hs.2
+      exact hnot ((mem_distSet_iff P d).mpr ⟨p, hpP, q, hqP, hpq, hd_eq⟩)
+    unfold distMult at hpos
+    rw [heq, Finset.card_empty] at hpos
+    omega
+  · rintro ⟨hd, hle⟩
+    exact ⟨distMult_pos_of_mem_distSet hd, hle⟩
+
+lemma lowMultiplicityDistances_ncard (P : Finset Pt) :
+    (lowMultiplicityDistances P).ncard = (rareDistances P).card := by
+  rw [lowMultiplicityDistances_eq_coe_rareDistances, Set.ncard_coe_finset]
+
+/-- Formal proof of `erdos_132.variants.hopf_pannwitz` matching PR #4389 (`google-deepmind/formal-conjectures`). -/
+theorem fc_hopf_pannwitz (P : Finset Pt) (hP : P.Nonempty) :
+    distanceMultiplicity P (Metric.diam (P : Set Pt)) ≤ P.card := by
+  rw [distanceMultiplicity_eq_distMult]
+  by_cases h2 : 2 ≤ P.card
+  · have hne : (distSet P).Nonempty := by
+      obtain ⟨a, ha, b, hb, hab⟩ := Finset.one_lt_card.mp (by omega : 1 < P.card)
+      exact ⟨dist a b, (mem_distSet_iff P _).mpr ⟨a, ha, b, hb, hab, rfl⟩⟩
+    let D := (distSet P).max' hne
+    have hD_mem : D ∈ distSet P := Finset.max'_mem (distSet P) hne
+    have hD_pos : 0 < D := pos_of_mem_distSet hD_mem
+    have hdiam_le : ∀ x ∈ P, ∀ y ∈ P, dist x y ≤ D := by
+      intro x hx y hy
+      by_cases hxy : x = y
+      · subst hxy; rw [dist_self]; exact le_of_lt hD_pos
+      · exact Finset.le_max' (distSet P) _ ((mem_distSet_iff P _).mpr ⟨x, hx, y, hy, hxy, rfl⟩)
+    have hbounded : Bornology.IsBounded (P : Set Pt) :=
+      Metric.isBounded_iff.mpr ⟨D, fun x hx y hy => hdiam_le x hx y hy⟩
+    have hdiam_eq : Metric.diam (P : Set Pt) = D := by
+      refine le_antisymm ?_ ?_
+      · exact Metric.diam_le_of_forall_dist_le (le_of_lt hD_pos) (fun x hx y hy => hdiam_le x hx y hy)
+      · obtain ⟨p, hp, q, hq, _, hdpq⟩ := (mem_distSet_iff P D).mp hD_mem
+        rw [← hdpq]
+        exact Metric.dist_le_diam_of_mem hbounded hp hq
+    rw [hdiam_eq]
+    exact hopf_pannwitz_aux P.card P rfl D hD_pos hdiam_le
+  · have hcard1 : P.card = 1 := by
+      have hpos := Finset.card_pos.mpr hP
+      omega
+    have heq : P.powersetCard 2 = ∅ := by
+      rw [← Finset.card_eq_zero, Finset.card_powersetCard, hcard1]
+      decide
+    unfold distMult
+    rw [heq, Finset.filter_empty, Finset.card_empty]
+    omega
+
+/-- Formal proof of `erdos_132.variants.four_points` matching PR #4389 (`google-deepmind/formal-conjectures`). -/
+theorem fc_four_points :
+    ∃ P : Finset Pt, P.card = 4 ∧ (lowMultiplicityDistances P).ncard < 2 := by
+  have h4 := not_erdos132_four
+  unfold Erdos132For at h4
+  push Not at h4
+  obtain ⟨P, hcard, hlt⟩ := h4
+  refine ⟨P, hcard, ?_⟩
+  rw [lowMultiplicityDistances_ncard]
+  exact hlt
+
+/-- Formal proof of `erdos_132.variants.erdos_fishburn` (`n = 5, 6`) matching PR #4389 (`google-deepmind/formal-conjectures`). -/
+theorem fc_erdos_fishburn (P : Finset Pt) (hP : P.card = 5 ∨ P.card = 6) :
+    2 ≤ (lowMultiplicityDistances P).ncard := by
+  rw [lowMultiplicityDistances_ncard]
+  rcases hP with h5 | h6
+  · exact erdos132_five P h5
+  · exact erdos132_six P h6
+
+/-- Formal proof of the `n = 14` barrier via the regular-13-gon moment obstruction, stated in PR #4389 API. -/
+theorem fc_fourteen_of_wei_and_class13 (P : Finset Pt) (hP : P.card = 14)
+    (hwei : ∀ X : Finset Pt, X.card = 14 → 7 ≤ (distSet X).card)
+    (hclass13 : ∀ Y : Finset Pt, Y.card = 13 → (distSet Y).card ≤ 6 →
+      (∀ d ∈ distSet Y, distMult Y d ≤ 15) → IsSimilarRegPoly 13 Y) :
+    2 ≤ (lowMultiplicityDistances P).ncard := by
+  rw [lowMultiplicityDistances_ncard]
+  exact erdos132_fourteen_of_wei_and_class13 hwei hclass13 P hP
+
+end FormalConjecturesBridge
 
 end Matematyka.Erdos132

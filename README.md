@@ -17,10 +17,12 @@ In `[Er97e]`, Erdős offered \$100 *"for any nontrivial result"* toward this pro
    - `five_point_two_dist_structure` & `erdos132_five`: certifies all `1,024` 2-distance patterns on `K_5` (`12` labeled `C_5` masks forcing `(d₂/d₁)² - 1 = u` with `u² - u - 1 = 0` and `(5, 5)` multiplicities, plus `1,012` refuted masks).
    - `no_six_point_two_dist`: proves `g(2) = 5` (`|D(X)| ≥ 3` for `|X| = 6`) via double counting (`4 · μ = 30`).
    - `erdos132_six`: refutes all `30` symmetric `(1, 7, 7)` extensions of canonical `C_5` using single `3 × 3` Gram minors reduced modulo `u² = u + 1`.
-4. **New General Regular-Polygon Moment-Inequality Obstruction (`m ≥ 4`) Closing `n = 14`:**
+4. **Compatibility Bridge for `google-deepmind/formal-conjectures` PR #4389 (`FormalConjecturesBridge`):**
+   Defines `distanceMultiplicity` and `lowMultiplicityDistances` (`Set ℝ` / `Set.ncard`) matching PR #4389 verbatim, proves exact equivalence (`distanceMultiplicity_eq_distMult`, `lowMultiplicityDistances_ncard`), and provides unconditional kernel-verified proofs of `fc_hopf_pannwitz`, `fc_four_points`, `fc_erdos_fishburn` (`n = 5, 6`), and `fc_fourteen_of_wei_and_class13`.
+5. **New General Regular-Polygon Moment-Inequality Obstruction (`m ≥ 4`) Closing `n = 14`:**
    - `regPoly_moment2` & `regPoly_moment4`: exact second and fourth distance moment identities on the unit regular `m`-gon `R_m` for `m ≥ 3`.
    - `no_regPoly_violator_extension`: proves that for every `m ≥ 4`, no point `x` outside `R_m` can match a vertex's degree signature plus a single diameter pair (`Δ > 0`), reducing the obstruction to `3m > 9` (sharp equality holds at `m = 3` for `rhombus4`).
-   - `erdos132_even_of_classification` & `erdos132_fourteen_of_wei_and_class13`: combines even-size endpoint descent (`C(2r+2, 2) = 1 + r(2r+3)`) with the moment obstruction to unify `n = 8, 10, 14` and resolve the `n = 14` barrier (`r = 6, m = 13`) via Wei's bound `g(6) = 13`, eliminating non-`R_13` spectra (`R_{12}^+` and centered hexagram) immediately because `24 > 15`.
+   - `erdos132_even_of_classification` & `erdos132_fourteen_of_wei_and_class13`: extends Marche's July 2026 note (`7 ≤ n ≤ 13`, `JuanMarchetto/erdos-132-note`) by combining even-size endpoint descent (`C(2r+2, 2) = 1 + r(2r+3)`) with the moment obstruction to unify `n = 8, 10, 14` and resolve the `n = 14` barrier (`r = 6, m = 13`) via Wei's bound `g(6) = 13`, eliminating non-`R_13` spectra (`R_{12}^+` and centered hexagram) immediately because `24 > 15`.
 
 ## Axiom Audit
 
