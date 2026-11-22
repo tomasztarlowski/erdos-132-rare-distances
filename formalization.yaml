@@ -40,7 +40,7 @@ sources:
     note: >-
       Companion preprint by the author presenting the regular-polygon moment obstruction for m >= 4,
       even-size descent for n = 2r + 2 (closing n = 14), and kernel-checked Gram-minor certificates
-      for n = 5 and n = 6.
+      for n = 5 and n = 6. Archived with permanent Zenodo DOI https://doi.org/10.5281/zenodo.24442667.
     author_endorsement: "participated"
   - title: "Multiplicities of interpoint distances in finite planar sets"
     authors:
@@ -139,7 +139,7 @@ automation:
         - "Gemini (mathematical exploration, Positivstellensatz search, Lean 4 proof engineering, metadata preparation)"
       tool_setup: >-
         Computational certificate discovery via Python/SymPy/mpmath (scripts/scan_erdos_132.py),
-        formalized and checked in Lean 4.37.0-rc1 against Mathlib v4.37.0-rc1.
+        formalized and checked in Lean 4.35.0 against Mathlib v4.35.0.
       prompting_notes: "Author-directed development; all proofs audited with Lean kernel and #print axioms."
   notes: >-
     AI assistance was used for proof search, certificate generation, Lean 4 proof engineering, and

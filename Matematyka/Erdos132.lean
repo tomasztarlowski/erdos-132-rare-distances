@@ -651,7 +651,7 @@ lemma hopf_pannwitz_aux :
       ((Y.powersetCard 2).filter (PairHasDist D)).card ≤ Y.card := by
   intro n
   induction n using Nat.strong_induction_on with
-  | ind n ih =>
+  | h n ih =>
     intro Y hcard D hD hdiam
     by_cases hdeg : ∀ p ∈ Y, (Y.filter (fun q => dist p q = D)).card ≤ 2
     · have h2e := two_mul_edgeCount_eq_sum_deg Y D hD
@@ -2298,7 +2298,7 @@ lemma sum_exp_regPoly {m k : ℕ} (hm : 3 ≤ m) (hk0 : 0 < k) (hkm : k < m) :
   have hterm : ∀ j : Fin m,
       Complex.exp (((2 * Real.pi * (k : ℝ) * (j.val : ℝ) / m : ℝ) : ℂ) * Complex.I) = z ^ j.val := by
     intro j
-    rw [← Complex.exp_natCast_mul]
+    rw [← Complex.exp_nat_mul]
     congr 1
     simp only [theta]
     push_cast
@@ -2333,7 +2333,7 @@ lemma sum_exp_regPoly {m k : ℕ} (hm : 3 ≤ m) (hk0 : 0 < k) (hkm : k < m) :
     · have : (m : ℤ) ≤ n * (m : ℤ) := by nlinarith
       omega
   have hzm : z ^ m = 1 := by
-    rw [← Complex.exp_natCast_mul]
+    rw [← Complex.exp_nat_mul]
     have hexp : (m : ℂ) * ((theta : ℂ) * Complex.I) = ↑(k : ℤ) * (2 * ↑Real.pi * Complex.I) := by
       simp only [theta]
       push_cast
@@ -2375,12 +2375,14 @@ theorem regPoly_moment2 {m : ℕ} (hm : 3 ≤ m) (x : Pt) :
     rw [dist_sq_pt, norm_sq_pt, regPolyPt, mkPt_zero, mkPt_one]
     have hcs := Real.cos_sq_add_sin_sq (2 * Real.pi * (j.val : ℝ) / m)
     push_cast
+    have h1 : (2 * Real.pi * 1 * (j.val : ℝ) / m) = 2 * Real.pi * (j.val : ℝ) / m := by ring
+    rw [h1]
     linarith [show (x 0 - Real.cos (2 * Real.pi * (j.val : ℝ) / m)) ^ 2 +
         (x 1 - Real.sin (2 * Real.pi * (j.val : ℝ) / m)) ^ 2 =
         x 0 ^ 2 + x 1 ^ 2 + (Real.cos (2 * Real.pi * (j.val : ℝ) / m) ^ 2 +
           Real.sin (2 * Real.pi * (j.val : ℝ) / m) ^ 2) -
-        2 * x 0 * Real.cos (2 * Real.pi * 1 * (j.val : ℝ) / m) -
-        2 * x 1 * Real.sin (2 * Real.pi * 1 * (j.val : ℝ) / m) by ring]
+        2 * x 0 * Real.cos (2 * Real.pi * (j.val : ℝ) / m) -
+        2 * x 1 * Real.sin (2 * Real.pi * (j.val : ℝ) / m) by ring]
   simp_rw [hpt]
   rw [Finset.sum_sub_distrib, Finset.sum_sub_distrib, Finset.sum_const, Finset.card_fin, nsmul_eq_mul]
   rw [← Finset.mul_sum, ← Finset.mul_sum]
@@ -2543,7 +2545,7 @@ lemma cos_add_int_mul_two_pi (x : ℝ) (z : ℤ) :
     have harg : (((x + (z : ℝ) * (2 * Real.pi) : ℝ) : ℂ) * Complex.I) =
         (x : ℂ) * Complex.I + (z : ℤ) * (2 * ↑Real.pi * Complex.I) := by
       push_cast; ring
-    rw [harg, Complex.exp_add, Complex.exp_intCast_mul, Complex.exp_two_pi_mul_I, one_zpow, mul_one]
+    rw [harg, Complex.exp_add, Complex.exp_int_mul, Complex.exp_two_pi_mul_I, one_zpow, mul_one]
   have hre := congrArg Complex.re hexp
   simpa only [Complex.exp_ofReal_mul_I_re] using hre
 
