@@ -107,9 +107,9 @@ theorem no_regPoly_violator_extension {m : ℕ} (hm : 4 ≤ m) (x : Pt) (j₀ : 
     {Δ : ℝ} (hΔ : 0 < Δ)
     (hdist : dist x (regPolyPt m j₀) = Δ)
     (hm2 : ∑ j : Fin m, dist x (regPolyPt m j) ^ 2 =
-      (∑ j : Fin m, dist (regPolyPt m ⟨0, by omega⟩) (regPolyPt m j) ^ 2) + Δ ^ 2)
+      (∑ j : Fin m, dist (regPolyPt m ⟨0, Nat.lt_of_lt_of_le (Nat.zero_lt_succ 3) hm⟩) (regPolyPt m j) ^ 2) + Δ ^ 2)
     (hm4 : ∑ j : Fin m, dist x (regPolyPt m j) ^ 4 =
-      (∑ j : Fin m, dist (regPolyPt m ⟨0, by omega⟩) (regPolyPt m j) ^ 4) + Δ ^ 4) :
+      (∑ j : Fin m, dist (regPolyPt m ⟨0, Nat.lt_of_lt_of_le (Nat.zero_lt_succ 3) hm⟩) (regPolyPt m j) ^ 4) + Δ ^ 4) :
     False := by
   sorry
 
