@@ -1,0 +1,155 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mathlib-initiative/formalization.yaml/main/schema/formalization.schema.json
+version: "v0.4"
+
+project:
+  name: "Partial Results and Regular-Polygon Moment Obstruction for Erdős Problem #132 (Rare Planar Distances)"
+  description: >-
+    Lean 4 and Mathlib formalization of partial results toward Erdős Problem #132 (rare planar
+    distances: whether every n >= 5 points in ℝ² determine at least two distances occurring between
+    1 and n times). Using only propext, Quot.sound, and Classical.choice (no sorry, no native_decide),
+    the repository proves unconditionally: (1) the Hopf–Pannwitz diameter theorem
+    (fc_hopf_pannwitz); (2) sharpness at n = 4 via the unit rhombus (fc_four_points); (3) g(2) = 5,
+    i.e., no 6-point planar 2-distance set exists (no_six_point_two_dist); (4) Erdős #132 for
+    n = 5 and n = 6 via kernel-verified 3x3 Gram-minor integer Positivstellensatz certificates across
+    all 1,024 K_5 edge 2-colorings and all 30 symmetric (1,7,7) 6-point extensions
+    (fc_erdos_fishburn); and (5) a general m >= 4 regular-polygon 2nd/4th-moment obstruction
+    theorem (no_regPoly_violator_extension, reducing impossibility to 3m > 9). Combining even-size
+    endpoint descent with this moment obstruction yields fc_fourteen_of_wei_and_class13, which
+    closes the previously open n = 14 barrier conditional on two explicit arguments: Wei's bound
+    g(6) = 13 and the 13-point <= 6-distance classification restricted to multiplicities <= 15
+    (where 24 > 15 eliminates R_{12}^+ and the centered hexagram, leaving R_{13}). The full
+    conjecture for arbitrary n >= 5 and the asymptotic growth question remain open.
+  authors:
+    - "Tomasz Tarłowski"
+  responsible_maintainers:
+    - "Tomasz Tarłowski"
+  license: "Apache-2.0"
+  repository_url: "https://github.com/tomasztarlowski/erdos-132-rare-distances"
+
+classification:
+  arxiv: ["math.CO", "math.MG", "cs.LO"]
+  msc2020: ["52C10", "05D99", "68V20"]
+
+sources:
+  - title: "Lean 4 Formalization of Erdős Problem #132 and a Regular-Polygon Moment Obstruction Closing n=14"
+    authors:
+      - "Tomasz Tarłowski"
+    id: "https://github.com/tomasztarlowski/erdos-132-rare-distances/blob/main/paper/erdos_132_rare_distances.pdf"
+    type: "paper"
+    relationship: "formalizes"
+    note: >-
+      Companion preprint by the author presenting the regular-polygon moment obstruction for m >= 4,
+      even-size descent for n = 2r + 2 (closing n = 14), and kernel-checked Gram-minor certificates
+      for n = 5 and n = 6.
+    author_endorsement: "participated"
+  - title: "Multiplicities of interpoint distances in finite planar sets"
+    authors:
+      - "Paul Erdős"
+      - "Peter C. Fishburn"
+    type: "paper"
+    location: "Discrete Applied Mathematics 60 (1995), 141–147"
+    relationship: "independently-proves"
+    note: >-
+      Proved the n = 5 and n = 6 cases informally; here fc_erdos_fishburn gives an independent,
+      kernel-verified Positivstellensatz proof in Lean 4 using 3x3 Gram minors.
+    author_endorsement: "not-contacted"
+  - title: "Aufgabe 167"
+    authors:
+      - "Heinz Hopf"
+      - "Erika Pannwitz"
+    type: "paper"
+    location: "Jber. Deutsch. Math. Verein. 43 (1934), 114"
+    relationship: "formalizes"
+    note: "Formalizes the planar diameter multiplicity bound μ(P, diam(P)) <= |P| (fc_hopf_pannwitz)."
+    author_endorsement: "not-contacted"
+  - title: "A proof of Erdős–Fishburn's conjecture for g(6)=13"
+    authors:
+      - "Xianglin Wei"
+    type: "paper"
+    location: "Electron. J. Combin. 19 (2012)"
+    relationship: "background"
+    note: "Literature input supplied as the explicit hypothesis hwei in fc_fourteen_of_wei_and_class13."
+    author_endorsement: "not-contacted"
+  - title: "On multiplicities of interpoint distances"
+    authors:
+      - "Felix Christian Clemen"
+      - "Adrian Dumitrescu"
+      - "Dingyuan Liu"
+    id: "arXiv:2505.04283"
+    type: "paper"
+    relationship: "background"
+    note: "Resolved convex position and 'not too convex' sets; referenced context only."
+    author_endorsement: "not-contacted"
+  - title: "On distances of low multiplicity: the cases 7 <= n <= 13 of a problem of Erdős"
+    authors:
+      - "Marche"
+    id: "https://github.com/JuanMarchetto/erdos-132-note"
+    type: "other"
+    relationship: "background"
+    note: "Covered 7 <= n <= 13 without formal proofs and left n = 14 open."
+    author_endorsement: "not-contacted"
+  - title: "Erdős Problem #132"
+    id: "https://www.erdosproblems.com/132"
+    type: "web discussion"
+    relationship: "background"
+    contributors:
+      - name: "Paul Erdős"
+        role: "problem-proposer"
+      - name: "János Pach"
+        role: "problem-proposer"
+      - name: "Thomas F. Bloom"
+        role: "maintainer"
+    note: >-
+      Problem database entry citing [Er84c], [ErPa90], [ErFi95], [Er97b], and [Er97e] ($100 prize
+      for any nontrivial result).
+
+related_formalizations:
+  - id: "https://github.com/google-deepmind/formal-conjectures/pull/4389"
+    relationship: "adapts"
+    note: >-
+      FormalConjecturesBridge uses the exact distanceMultiplicity and lowMultiplicityDistances
+      definitions of PR #4389, supplying machine-checked proofs for the sorry'd hopf_pannwitz,
+      four_points, and erdos_fishburn statements plus n = 14.
+  - id: "https://github.com/AItoBit/erdos-132-lean"
+    relationship: "independent"
+    note: "Independent formalization of the n = 4 rhombus counterexample only."
+  - id: "https://github.com/EvanBeller/erdos-132"
+    relationship: "independent"
+    note: "Independent Lean formalization conditional on external literature for the n = 8 case."
+  - id: "https://github.com/g8r-b8/erdos132-lean"
+    relationship: "independent"
+    note: "Independent Lean formalization of Clemen–Dumitrescu–Liu Problem 1.6 upper bound 4/3."
+
+status:
+  scope: >-
+    Formalized and proved unconditionally: Hopf–Pannwitz (fc_hopf_pannwitz), n = 4 sharpness
+    (fc_four_points), g(2) = 5 (no_six_point_two_dist), n = 5 and n = 6 (fc_erdos_fishburn),
+    and the m >= 4 regular-polygon moment obstruction (no_regPoly_violator_extension). Proved
+    conditionally on explicit hypotheses hwei and hclass13: n = 14 (fc_fourteen_of_wei_and_class13).
+    The general conjecture for arbitrary n >= 5 remains open.
+  sorry_count: 0
+  sorry_in_definitions: 0
+  axioms: ["propext", "Quot.sound", "Classical.choice"]
+
+automation:
+  methods:
+    - method: "agent"
+      framework: "Google Antigravity"
+      models:
+        - "Gemini (mathematical exploration, Positivstellensatz search, Lean 4 proof engineering, metadata preparation)"
+      tool_setup: >-
+        Computational certificate discovery via Python/SymPy/mpmath (scripts/scan_erdos_132.py),
+        formalized and checked in Lean 4.37.0-rc1 against Mathlib v4.37.0-rc1.
+      prompting_notes: "Author-directed development; all proofs audited with Lean kernel and #print axioms."
+  notes: >-
+    AI assistance was used for proof search, certificate generation, Lean 4 proof engineering, and
+    drafting; the author reviewed the mathematical arguments and verified compilation with zero sorry.
+
+review:
+  status: "self-assessed"
+  notes: >-
+    Verified locally by the author with `lake build Matematyka Challenge Solution` and `#print axioms`
+    confirming only propext, Quot.sound, and Classical.choice; not independently peer-reviewed.
+
+acknowledgements: >-
+  Lean 4 and Mathlib contributors, Thomas Bloom (erdosproblems.com), and google-deepmind/formal-conjectures.

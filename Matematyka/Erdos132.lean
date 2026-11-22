@@ -1,4 +1,6 @@
-import Mathlib
+module
+
+public import Mathlib
 
 /-!
 # Erdős Problem #132: Rare Distances in Planar Point Sets
@@ -13,6 +15,8 @@ All proofs in this file depend strictly on the three standard Lean axioms
 `{propext, Classical.choice, Quot.sound}` (zero `sorry`, zero `admit`,
 zero `native_decide`, zero `bv_decide`, zero custom axioms).
 -/
+
+@[expose] public section
 
 namespace Matematyka.Erdos132
 
@@ -213,40 +217,40 @@ noncomputable def r4p3 : Pt := mkPt (1 / 2) (-Real.sqrt 3 / 2)
 
 noncomputable def rhombus4 : Finset Pt := {r4p0, r4p1, r4p2, r4p3}
 
-private lemma sqrt3_pos : 0 < Real.sqrt 3 := Real.sqrt_pos.mpr (by norm_num)
+lemma sqrt3_pos : 0 < Real.sqrt 3 := Real.sqrt_pos.mpr (by norm_num)
 
-private lemma r4_ne_01 : r4p0 ≠ r4p1 := by
+lemma r4_ne_01 : r4p0 ≠ r4p1 := by
   intro h; have := congrArg (fun p : Pt => p 0) h; simp [r4p0, r4p1, mkPt] at this
-private lemma r4_ne_02 : r4p0 ≠ r4p2 := by
+lemma r4_ne_02 : r4p0 ≠ r4p2 := by
   intro h; have := congrArg (fun p : Pt => p 0) h; simp [r4p0, r4p2, mkPt] at this
-private lemma r4_ne_03 : r4p0 ≠ r4p3 := by
+lemma r4_ne_03 : r4p0 ≠ r4p3 := by
   intro h; have := congrArg (fun p : Pt => p 0) h; simp [r4p0, r4p3, mkPt] at this
-private lemma r4_ne_12 : r4p1 ≠ r4p2 := by
+lemma r4_ne_12 : r4p1 ≠ r4p2 := by
   intro h; have := congrArg (fun p : Pt => p 0) h; norm_num [r4p1, r4p2, mkPt] at this
-private lemma r4_ne_13 : r4p1 ≠ r4p3 := by
+lemma r4_ne_13 : r4p1 ≠ r4p3 := by
   intro h; have := congrArg (fun p : Pt => p 0) h; norm_num [r4p1, r4p3, mkPt] at this
-private lemma r4_ne_23 : r4p2 ≠ r4p3 := by
+lemma r4_ne_23 : r4p2 ≠ r4p3 := by
   intro h
   have := congrArg (fun p : Pt => p 1) h
   simp only [r4p2, r4p3, mkPt_one] at this
   linarith [sqrt3_pos]
 
-private lemma r4_dist_01 : dist r4p0 r4p1 = 1 := by
+lemma r4_dist_01 : dist r4p0 r4p1 = 1 := by
   rw [← sq_eq_sq₀ dist_nonneg (by norm_num : (0 : ℝ) ≤ 1)]
   rw [r4p0, r4p1, dist_sq_mkPt]; norm_num
-private lemma r4_dist_02 : dist r4p0 r4p2 = 1 := by
+lemma r4_dist_02 : dist r4p0 r4p2 = 1 := by
   rw [← sq_eq_sq₀ dist_nonneg (by norm_num : (0 : ℝ) ≤ 1)]
   rw [r4p0, r4p2, dist_sq_mkPt]; nlinarith [Real.sq_sqrt (by norm_num : (0 : ℝ) ≤ 3)]
-private lemma r4_dist_03 : dist r4p0 r4p3 = 1 := by
+lemma r4_dist_03 : dist r4p0 r4p3 = 1 := by
   rw [← sq_eq_sq₀ dist_nonneg (by norm_num : (0 : ℝ) ≤ 1)]
   rw [r4p0, r4p3, dist_sq_mkPt]; nlinarith [Real.sq_sqrt (by norm_num : (0 : ℝ) ≤ 3)]
-private lemma r4_dist_12 : dist r4p1 r4p2 = 1 := by
+lemma r4_dist_12 : dist r4p1 r4p2 = 1 := by
   rw [← sq_eq_sq₀ dist_nonneg (by norm_num : (0 : ℝ) ≤ 1)]
   rw [r4p1, r4p2, dist_sq_mkPt]; nlinarith [Real.sq_sqrt (by norm_num : (0 : ℝ) ≤ 3)]
-private lemma r4_dist_13 : dist r4p1 r4p3 = 1 := by
+lemma r4_dist_13 : dist r4p1 r4p3 = 1 := by
   rw [← sq_eq_sq₀ dist_nonneg (by norm_num : (0 : ℝ) ≤ 1)]
   rw [r4p1, r4p3, dist_sq_mkPt]; nlinarith [Real.sq_sqrt (by norm_num : (0 : ℝ) ≤ 3)]
-private lemma r4_dist_23 : dist r4p2 r4p3 = Real.sqrt 3 := by
+lemma r4_dist_23 : dist r4p2 r4p3 = Real.sqrt 3 := by
   rw [← sq_eq_sq₀ dist_nonneg (le_of_lt sqrt3_pos)]
   rw [r4p2, r4p3, dist_sq_mkPt]; nlinarith [Real.sq_sqrt (by norm_num : (0 : ℝ) ≤ 3)]
 
@@ -407,20 +411,20 @@ end Counterexample4
 
 section HopfPannwitz
 
-private def det2 (u v : Pt) : ℝ := u 0 * v 1 - u 1 * v 0
+def det2 (u v : Pt) : ℝ := u 0 * v 1 - u 1 * v 0
 
-private lemma cramer2 (u₁ u₂ u₃ : Pt) :
+lemma cramer2 (u₁ u₂ u₃ : Pt) :
     det2 u₁ u₂ • u₃ + det2 u₂ u₃ • u₁ + det2 u₃ u₁ • u₂ = 0 := by
   ext i
   fin_cases i <;> simp [det2] <;> ring
 
-private lemma lagrange2 (u v : Pt) :
+lemma lagrange2 (u v : Pt) :
     det2 u v ^ 2 + inner ℝ u v ^ 2 = ‖u‖ ^ 2 * ‖v‖ ^ 2 := by
   rw [norm_sq_pt u, norm_sq_pt v, inner_pt u v]
   simp only [det2]
   ring
 
-private lemma unit_cone_middle_vector {u₁ u₂ u₃ : Pt}
+lemma unit_cone_middle_vector {u₁ u₂ u₃ : Pt}
     (h1 : ‖u₁‖ = 1) (h2 : ‖u₂‖ = 1) (h3 : ‖u₃‖ = 1)
     (h12 : u₁ ≠ u₂) (h13 : u₁ ≠ u₃) (h23 : u₂ ≠ u₃)
     (hi12 : (1 / 2 : ℝ) ≤ inner ℝ u₁ u₂)
@@ -536,7 +540,7 @@ private lemma unit_cone_middle_vector {u₁ u₂ u₃ : Pt}
       h3 h1 h2 hlt31 hcr31 hd31 (by nlinarith) (by nlinarith)))
   · exact (not_all_pos ⟨hp12, hp23, hp31⟩).elim
 
-private lemma unit_cone_unique_neighbor {u_a u_b u_m w : Pt} {α β : ℝ}
+lemma unit_cone_unique_neighbor {u_a u_b u_m w : Pt} {α β : ℝ}
     (ha : ‖u_a‖ = 1) (hb : ‖u_b‖ = 1) (hm : ‖u_m‖ = 1)
     (hα : 0 < α) (hβ : 0 < β) (hsum : 1 < α + β)
     (hcomb : u_m = α • u_a + β • u_b)
@@ -1001,7 +1005,7 @@ def checkC5Entry (entry : ℕ × List ℕ) : Bool :=
   (List.range 5).all (fun a => (List.range 5).all fun b =>
     !(a < b) || (Nat.testBit m (pairIdx5 (perm.getD a 9) (perm.getD b 9)) == isC5EdgeNat a b))
 
-private lemma c5TableData_ok : c5TableData.all checkC5Entry = true := by decide
+lemma c5TableData_ok : c5TableData.all checkC5Entry = true := by decide
 
 abbrev Cert5 := Bool × ℕ × ℕ × List ℤ × List ℤ
 
@@ -1017,7 +1021,7 @@ def verifyCerts5 : ℕ → ℕ → List Cert5 → Bool
   | m, stop, [] => m == stop
   | m, stop, c :: cs => checkCert5 m c && verifyCerts5 (m + 1) stop cs
 
-private lemma exists_cert5_of_verify :
+lemma exists_cert5_of_verify :
     ∀ (start stop : ℕ) (cs : List Cert5), verifyCerts5 start stop cs = true →
       ∀ m, start ≤ m → m < stop → ∃ c, checkCert5 m c = true
   | start, stop, [], h, m, hm1, hm2 => by
@@ -1064,7 +1068,7 @@ def certs5_0 : List Cert5 := [
   ⟨false, 3, 0, [1], []⟩, ⟨false, 3, 0, [1], []⟩, ⟨false, 3, 0, [1], []⟩, ⟨false, 3, 0, [1], []⟩
 ]
 
-private lemma certs5_0_ok : verifyCerts5 0 128 certs5_0 = true := by decide
+lemma certs5_0_ok : verifyCerts5 0 128 certs5_0 = true := by decide
 
 def certs5_1 : List Cert5 := [
   ⟨false, 0, 0, [1], []⟩, ⟨false, 0, 0, [1], []⟩, ⟨false, 1, 0, [1], []⟩, ⟨false, 6, 0, [1], []⟩,
@@ -1101,7 +1105,7 @@ def certs5_1 : List Cert5 := [
   ⟨false, 7, 0, [-1], []⟩, ⟨false, 2, 0, [-1, -1], []⟩, ⟨false, 3, 0, [1], []⟩, ⟨false, 0, 0, [1], []⟩
 ]
 
-private lemma certs5_1_ok : verifyCerts5 128 256 certs5_1 = true := by decide
+lemma certs5_1_ok : verifyCerts5 128 256 certs5_1 = true := by decide
 
 def certs5_2 : List Cert5 := [
   ⟨false, 0, 0, [1], []⟩, ⟨false, 0, 0, [1], []⟩, ⟨false, 0, 0, [1], []⟩, ⟨false, 2, 0, [-1], []⟩,
@@ -1138,7 +1142,7 @@ def certs5_2 : List Cert5 := [
   ⟨false, 3, 0, [1], []⟩, ⟨false, 6, 0, [1, 1], []⟩, ⟨false, 3, 0, [1], []⟩, ⟨false, 3, 0, [1], []⟩
 ]
 
-private lemma certs5_2_ok : verifyCerts5 256 384 certs5_2 = true := by decide
+lemma certs5_2_ok : verifyCerts5 256 384 certs5_2 = true := by decide
 
 def certs5_3 : List Cert5 := [
   ⟨false, 0, 0, [1], []⟩, ⟨false, 0, 0, [1], []⟩, ⟨false, 2, 0, [-1], []⟩, ⟨false, 2, 0, [-1], []⟩,
@@ -1175,7 +1179,7 @@ def certs5_3 : List Cert5 := [
   ⟨false, 2, 0, [-1], []⟩, ⟨false, 2, 0, [-1], []⟩, ⟨false, 3, 0, [1], []⟩, ⟨false, 0, 0, [1], []⟩
 ]
 
-private lemma certs5_3_ok : verifyCerts5 384 512 certs5_3 = true := by decide
+lemma certs5_3_ok : verifyCerts5 384 512 certs5_3 = true := by decide
 
 def certs5_4 : List Cert5 := [
   ⟨false, 0, 0, [1], []⟩, ⟨false, 0, 0, [1], []⟩, ⟨false, 0, 0, [1], []⟩, ⟨false, 2, 0, [-1], []⟩,
@@ -1212,7 +1216,7 @@ def certs5_4 : List Cert5 := [
   ⟨false, 3, 0, [1], []⟩, ⟨false, 3, 0, [1], []⟩, ⟨false, 3, 0, [1], []⟩, ⟨false, 3, 0, [1], []⟩
 ]
 
-private lemma certs5_4_ok : verifyCerts5 512 640 certs5_4 = true := by decide
+lemma certs5_4_ok : verifyCerts5 512 640 certs5_4 = true := by decide
 
 def certs5_5 : List Cert5 := [
   ⟨false, 0, 0, [1], []⟩, ⟨false, 0, 0, [1], []⟩, ⟨false, 1, 0, [1], []⟩, ⟨false, 6, 0, [1], []⟩,
@@ -1249,7 +1253,7 @@ def certs5_5 : List Cert5 := [
   ⟨false, 0, 1, [2, -1], [-6, 2]⟩, ⟨false, 1, 0, [1], []⟩, ⟨false, 3, 0, [1], []⟩, ⟨false, 0, 0, [1], []⟩
 ]
 
-private lemma certs5_5_ok : verifyCerts5 640 768 certs5_5 = true := by decide
+lemma certs5_5_ok : verifyCerts5 640 768 certs5_5 = true := by decide
 
 def certs5_6 : List Cert5 := [
   ⟨false, 0, 0, [1], []⟩, ⟨false, 0, 0, [1], []⟩, ⟨false, 0, 0, [1], []⟩, ⟨false, 2, 0, [-1], []⟩,
@@ -1286,7 +1290,7 @@ def certs5_6 : List Cert5 := [
   ⟨false, 0, 5, [-14, 5], [17, -1, -5]⟩, ⟨false, 1, 0, [1], []⟩, ⟨false, 7, 0, [-1], []⟩, ⟨false, 1, 0, [1], []⟩
 ]
 
-private lemma certs5_6_ok : verifyCerts5 768 896 certs5_6 = true := by decide
+lemma certs5_6_ok : verifyCerts5 768 896 certs5_6 = true := by decide
 
 def certs5_7 : List Cert5 := [
   ⟨false, 0, 0, [1], []⟩, ⟨false, 0, 0, [1], []⟩, ⟨false, 2, 0, [-1], []⟩, ⟨false, 2, 0, [-1], []⟩,
@@ -1323,9 +1327,9 @@ def certs5_7 : List Cert5 := [
   ⟨false, 2, 0, [-1], []⟩, ⟨false, 2, 0, [-1], []⟩, ⟨false, 3, 0, [1], []⟩, ⟨false, 0, 0, [1], []⟩
 ]
 
-private lemma certs5_7_ok : verifyCerts5 896 1024 certs5_7 = true := by decide
+lemma certs5_7_ok : verifyCerts5 896 1024 certs5_7 = true := by decide
 
-private lemma exists_cert5_of_lt1024 (m : ℕ) (hm : m < 1024) :
+lemma exists_cert5_of_lt1024 (m : ℕ) (hm : m < 1024) :
     ∃ c, checkCert5 m c = true := by
   by_cases h0 : m < 128
   · exact exists_cert5_of_verify 0 128 certs5_0 certs5_0_ok m (by omega) h0
@@ -1421,7 +1425,7 @@ def verifyCerts6 : Bool :=
   allN6Triples.all fun t =>
     certs6Data.any fun c => c.1 == t.1 && c.2.1 == t.2.1 && c.2.2.1 == t.2.2 && checkCert6 c
 
-private lemma verifyCerts6_ok : verifyCerts6 = true := by decide
+lemma verifyCerts6_ok : verifyCerts6 = true := by decide
 
 lemma distMult_map_fin {n : ℕ} (q : Fin n ↪ Pt) (d : ℝ) :
     distMult (Finset.univ.map q) d =
@@ -1661,7 +1665,7 @@ lemma even_tight_violator_descent {r : ℕ} (hr : 1 ≤ r) {X : Finset Pt}
     · exact hy₂.1 rfl
     · exact hy₁.1 rfl
 
-private lemma exists_mask_lt_pow :
+lemma exists_mask_lt_pow :
     ∀ (n : ℕ) (f : ℕ → Bool), ∃ m < 2 ^ n, ∀ k < n, Nat.testBit m k = f k
   | 0, _ => ⟨0, by simp, fun k hk => by omega⟩
   | n + 1, f => by
@@ -1681,20 +1685,20 @@ private lemma exists_mask_lt_pow :
         rw [Nat.testBit_succ, hdiv]
         exact hbits k (by omega)
 
-private lemma pairIdx5_lt10 : ∀ a b : Fin 5, pairIdx5 a.val b.val < 10 := by
+lemma pairIdx5_lt10 : ∀ a b : Fin 5, pairIdx5 a.val b.val < 10 := by
   decide
 
-private lemma pair5At_pairIdx5 :
+lemma pair5At_pairIdx5 :
     ∀ a b : Fin 5, a ≠ b → pair5At (pairIdx5 a.val b.val) = (min a.val b.val, max a.val b.val) := by
   decide
 
-private lemma pairIdx5_comm (a b : ℕ) : pairIdx5 a b = pairIdx5 b a := by
+lemma pairIdx5_comm (a b : ℕ) : pairIdx5 a b = pairIdx5 b a := by
   simp only [pairIdx5, min_comm, max_comm]
 
-private lemma isC5EdgeNat_comm (a b : ℕ) : isC5EdgeNat a b = isC5EdgeNat b a := by
+lemma isC5EdgeNat_comm (a b : ℕ) : isC5EdgeNat a b = isC5EdgeNat b a := by
   simp only [isC5EdgeNat, min_comm, max_comm]
 
-private lemma sub4At_lt5 (t : ℕ) :
+lemma sub4At_lt5 (t : ℕ) :
     (sub4At t).1 < 5 ∧ (sub4At t).2.1 < 5 ∧ (sub4At t).2.2 < 5 := by
   rcases eq_or_ne t 0 with rfl | h0
   · decide
@@ -1704,7 +1708,7 @@ private lemma sub4At_lt5 (t : ℕ) :
       · decide
       · simp [sub4At]
 
-private lemma c5_poly_root_eq_zero {u : ℝ} (hu : 0 < u) (heval : evalZ u [4, 6, -2, -2] = 0) :
+lemma c5_poly_root_eq_zero {u : ℝ} (hu : 0 < u) (heval : evalZ u [4, 6, -2, -2] = 0) :
     u ^ 2 - u - 1 = 0 := by
   simp only [evalZ, Int.cast_ofNat, Int.cast_neg] at heval
   have hfac : (-2 : ℝ) * (u + 2) * (u ^ 2 - u - 1) =
@@ -2044,19 +2048,19 @@ lemma evalUV_reduceU2 {u : ℝ} (hu : u ^ 2 - u - 1 = 0) (v : ℝ) :
       _ = evalZ v c + u * (evalZ v (reduceU2 cs).1 + u * evalZ v (reduceU2 cs).2) := by ring
       _ = evalZ v c + u * evalUV u v cs := by rw [ih]
 
-private lemma sub5At_lt6 (t : ℕ) :
+lemma sub5At_lt6 (t : ℕ) :
     (sub5At t).1 < 6 ∧ (sub5At t).2.1 < 6 ∧ (sub5At t).2.2 < 6 := by
   match t with
   | 0 => decide | 1 => decide | 2 => decide | 3 => decide | 4 => decide
   | 5 => decide | 6 => decide | 7 => decide | 8 => decide
   | n + 9 => simp [sub5At]
 
-private lemma mem_allN6Triples (tv a1 a2 : Fin 5) (h12 : a1 < a2) (h1 : a1 ≠ tv) (h2 : a2 ≠ tv) :
+lemma mem_allN6Triples (tv a1 a2 : Fin 5) (h12 : a1 < a2) (h1 : a1 ≠ tv) (h2 : a2 ≠ tv) :
     (tv.val, a1.val, a2.val) ∈ allN6Triples := by
   revert tv a1 a2 h12 h1 h2
   decide
 
-private lemma checkCert6_refutes {u v : ℝ} (hu : 0 < u) (hv : 0 < v) (hroot : u ^ 2 - u - 1 = 0)
+lemma checkCert6_refutes {u v : ℝ} (hu : 0 < u) (hv : 0 < v) (hroot : u ^ 2 - u - 1 = 0)
     {c : Cert6} (hc : checkCert6 c = true) :
     evalUV u v (minor6UV c.1 c.2.1 c.2.2.1 c.2.2.2.1) ≠ 0 := by
   rcases c with ⟨tv, a1, a2, idx, sgn⟩
@@ -2285,7 +2289,7 @@ section RegularPolygonObstruction
 noncomputable def regPolyPt (m : ℕ) (j : Fin m) : Pt :=
   mkPt (Real.cos (2 * Real.pi * (j.val : ℝ) / m)) (Real.sin (2 * Real.pi * (j.val : ℝ) / m))
 
-private lemma sum_exp_regPoly {m k : ℕ} (hm : 3 ≤ m) (hk0 : 0 < k) (hkm : k < m) :
+lemma sum_exp_regPoly {m k : ℕ} (hm : 3 ≤ m) (hk0 : 0 < k) (hkm : k < m) :
     ∑ j : Fin m, Complex.exp (((2 * Real.pi * (k : ℝ) * (j.val : ℝ) / m : ℝ) : ℂ) * Complex.I) = 0 := by
   have hm_r : (m : ℝ) ≠ 0 := by positivity
   have hm_c : (m : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr (by omega)
@@ -2532,7 +2536,7 @@ lemma euclideanSimilarity_rotation_scale_trans (c : Pt) {R : ℝ} (hR : 0 < R) (
     have hcs := Real.cos_sq_add_sin_sq theta₀
     linear_combination (R ^ 2 * ((a 0 - b 0) ^ 2 + (a 1 - b 1) ^ 2)) * hcs
 
-private lemma cos_add_int_mul_two_pi (x : ℝ) (z : ℤ) :
+lemma cos_add_int_mul_two_pi (x : ℝ) (z : ℤ) :
     Real.cos (x + (z : ℝ) * (2 * Real.pi)) = Real.cos x := by
   have hexp : Complex.exp (((x + (z : ℝ) * (2 * Real.pi) : ℝ) : ℂ) * Complex.I) =
       Complex.exp ((x : ℂ) * Complex.I) := by
@@ -2543,7 +2547,7 @@ private lemma cos_add_int_mul_two_pi (x : ℝ) (z : ℤ) :
   have hre := congrArg Complex.re hexp
   simpa only [Complex.exp_ofReal_mul_I_re] using hre
 
-private lemma unitCircle_dist_sq (alpha beta : ℝ) :
+lemma unitCircle_dist_sq (alpha beta : ℝ) :
     dist (mkPt (Real.cos alpha) (Real.sin alpha)) (mkPt (Real.cos beta) (Real.sin beta)) ^ 2 =
       2 - 2 * Real.cos (alpha - beta) := by
   rw [dist_sq_mkPt, Real.cos_sub]
@@ -2553,7 +2557,7 @@ private lemma unitCircle_dist_sq (alpha beta : ℝ) :
     (Real.cos alpha ^ 2 + Real.sin alpha ^ 2) + (Real.cos beta ^ 2 + Real.sin beta ^ 2) -
       2 * (Real.cos alpha * Real.cos beta + Real.sin alpha * Real.sin beta) by ring]
 
-private lemma regPolyPt_injective {m : ℕ} (hm : 3 ≤ m) :
+lemma regPolyPt_injective {m : ℕ} (hm : 3 ≤ m) :
     Function.Injective (regPolyPt m) := by
   intro j₁ j₂ hj
   have hcos : Real.cos (2 * Real.pi * (j₁.val : ℝ) / m) =
@@ -2604,7 +2608,7 @@ private lemma regPolyPt_injective {m : ℕ} (hm : 3 ≤ m) :
   rw [hn0, zero_mul] at hdiff_z
   exact Fin.ext (by omega)
 
-private lemma regPolyPt_rot_dist {m : ℕ} (hm : 3 ≤ m) (k : ℕ) (j₁ j₂ : Fin m) :
+lemma regPolyPt_rot_dist {m : ℕ} (hm : 3 ≤ m) (k : ℕ) (j₁ j₂ : Fin m) :
     dist (regPolyPt m ⟨(j₁.val + k) % m, Nat.mod_lt _ (by omega)⟩)
          (regPolyPt m ⟨(j₂.val + k) % m, Nat.mod_lt _ (by omega)⟩) =
       dist (regPolyPt m j₁) (regPolyPt m j₂) := by
@@ -2645,7 +2649,7 @@ private lemma regPolyPt_rot_dist {m : ℕ} (hm : 3 ≤ m) (k : ℕ) (j₁ j₂ :
           field_simp [hm_r]
   rw [hangle, cos_add_int_mul_two_pi]
 
-private lemma choose_two_r_add_one (r : ℕ) :
+lemma choose_two_r_add_one (r : ℕ) :
     Nat.choose (2 * r + 1) 2 = r * (2 * r + 1) := by
   rw [Nat.choose_two_right]
   have hsub : 2 * r + 1 - 1 = 2 * r := by omega

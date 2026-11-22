@@ -1,0 +1,13 @@
+{
+  "challenge_module": "Challenge",
+  "solution_module": "Solution",
+  "theorem_names": [
+    "Matematyka.Erdos132.fc_hopf_pannwitz",
+    "Matematyka.Erdos132.fc_four_points",
+    "Matematyka.Erdos132.no_six_point_two_dist",
+    "Matematyka.Erdos132.fc_erdos_fishburn",
+    "Matematyka.Erdos132.no_regPoly_violator_extension",
+    "Matematyka.Erdos132.fc_fourteen_of_wei_and_class13"
+  ],
+  "permitted_axioms": ["propext", "Quot.sound", "Classical.choice"]
+}
