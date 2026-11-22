@@ -2,6 +2,8 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24442667.svg)](https://doi.org/10.5281/zenodo.24442667)
 
+- **Palomar Registry:** [`PALOMAR-2026-11-22-000019`](https://palomar-registry.org/entry.html?id=PALOMAR-2026-11-22-000019&version=1) | **Zenodo DOI:** [`10.5281/zenodo.24442667`](https://doi.org/10.5281/zenodo.24442667)
+
 Formalization in Lean 4 (Mathlib `v4.35.0`) and computational certificate verification for **Erdős Problem #132** ([erdosproblems.com/132](https://www.erdosproblems.com/132)):
 
 > Given a finite set $X \subset \mathbb{R}^2$ of $n \ge 5$ points, must there exist at least two distinct distances occurring at least once and between at most $n$ pairs of points? Must the number of such rare distances tend to $\infty$ as $n \to \infty$?

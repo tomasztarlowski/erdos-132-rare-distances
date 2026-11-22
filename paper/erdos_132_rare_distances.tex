@@ -188,16 +188,17 @@ Regular $R_m$ and $R_m^+$ & $n = 5 \dots 16$ & $2 \dots 8$ & $5 \dots 15$ & $2 \
 
 \section{Reproducibility and Axiom Verification}
 
-All computational certificates (\texttt{data/\allowbreak erdos\_\allowbreak 132\_\allowbreak certificates.json}), verification tests (\texttt{tests/\allowbreak test\_erdos\_132.py}), and Lean~4 proofs (\texttt{Matematyka/\allowbreak Erdos132.lean}, located at \texttt{lean/\allowbreak Matematyka/\allowbreak Erdos132.lean} in the development workspace) are publicly archived at
+All computational certificates (\texttt{data/\allowbreak erdos\_\allowbreak 132\_\allowbreak certificates.json}), verification scripts (\texttt{scripts/\allowbreak scan\_\allowbreak erdos\_\allowbreak 132.py}), and Lean~4 proofs (\texttt{Matematyka/\allowbreak Erdos132.lean}, with challenge/solution targets \texttt{Challenge.lean}, \texttt{Solution.lean}, and \texttt{comparator.json}) are publicly archived at
 \begin{center}
 \url{https://github.com/tomasztarlowski/erdos-132-rare-distances}
 \end{center}
-and are self-contained and reproducible:
+together with permanent Zenodo DOI \url{https://doi.org/10.5281/zenodo.24442667} and Palomar Registry entry \texttt{PALOMAR-2026-11-22-000019} (\url{https://palomar-registry.org/entry.html?id=PALOMAR-2026-11-22-000019&version=1}), and are self-contained and reproducible:
 \begin{verbatim}
 python3 scripts/scan_erdos_132.py --self-test
-lake env lean Matematyka/Erdos132.lean
+lake exe cache get && lake build Matematyka Challenge Solution
+lake comparator --paranoid
 \end{verbatim}
-The full axiom audit and test suite also run via \texttt{.venv/\allowbreak bin/\allowbreak python tools/\allowbreak council\_cli.py lean-check Matematyka/\allowbreak Erdos132.lean} and \texttt{.venv/\allowbreak bin/\allowbreak pytest tests/\allowbreak test\_erdos\_132.py -q}. Every exported theorem depends strictly on Lean's three foundational axioms \texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound}, with zero \texttt{sorry}, zero \texttt{admit}, zero \texttt{native\_decide}, zero \texttt{bv\_decide}, and zero custom axioms.
+Every exported theorem has been audited with \texttt{lake comparator} (Lean's kernel together with \texttt{nanoda} and \texttt{con-ron}) and depends strictly on Lean's three foundational axioms \texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound}, with zero \texttt{sorry}, zero \texttt{admit}, zero \texttt{native\_decide}, zero \texttt{bv\_decide}, and zero custom axioms.
 
 \subsection*{AI Assistance Disclosure}
 Proof exploration, computational certificate generation, Lean~4 proof engineering, and manuscript drafting were carried out with assistance from AI coding tools. Every mathematical step, reference, and Lean~4 theorem was reviewed by the author and independently verified by the Lean~4 kernel, symbolic computation (\texttt{SymPy}), and $80$-digit arithmetic (\texttt{mpmath}).
